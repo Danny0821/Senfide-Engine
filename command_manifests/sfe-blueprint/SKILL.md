@@ -1,6 +1,6 @@
 ---
 name: "sfe-blueprint"
-description: "Conversational onboarding interviewer that grills you about your project and scaffolds coordinated teams."
+description: "Interactive architect that maps database schemas and tech boundaries to design and compile a compact multi-agent blueprint JSON."
 version: "0.1.0"
 triggers:
   - "/sfe-blueprint"

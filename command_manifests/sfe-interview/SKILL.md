@@ -1,6 +1,6 @@
 ---
 name: "sfe-interview"
-description: "Conversational onboarding interviewer that grills you about your project and scaffolds coordinated teams."
+description: "Interactive onboarding assistant that conducts a step-by-step interview to discover project goals and scope requirements."
 version: "0.1.0"
 triggers:
   - "/sfe-interview"
