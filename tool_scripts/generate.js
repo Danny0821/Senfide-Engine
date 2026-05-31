@@ -50,6 +50,54 @@ function ensureDirectory(dirPath) {
 }
 
 /**
+ * Scaffold localized .sfe-version, local-workspace/sfe-mock.example, and .gitignore.
+ * @param {string} targetDir Folder path of the target workspace.
+ */
+function scaffoldBaseStructure(targetDir) {
+  try {
+    ensureDirectory(targetDir);
+
+    // 1. Scaffold .sfe-version containing "0.6.9"
+    fs.writeFileSync(path.join(targetDir, '.sfe-version'), '0.6.9\n', 'utf-8');
+
+    // 2. Scaffold local-workspace/sfe-mock.example with mock credentials
+    const localWorkspaceDir = path.join(targetDir, 'local-workspace');
+    ensureDirectory(localWorkspaceDir);
+    const mockExampleContent = `# Mock environment credentials example
+SFE_MOCK_API_KEY=mock_key_xyz123
+SFE_MOCK_API_SECRET=mock_secret_abc789
+`;
+    fs.writeFileSync(path.join(localWorkspaceDir, 'sfe-mock.example'), mockExampleContent, 'utf-8');
+
+    // 3. Create or append to .gitignore
+    const gitignorePath = path.join(targetDir, '.gitignore');
+    const entries = ['local-workspace/', 'sfe-mock.env'];
+    let currentContent = '';
+    if (fs.existsSync(gitignorePath)) {
+      currentContent = fs.readFileSync(gitignorePath, 'utf-8');
+    }
+
+    let modified = false;
+    let newLines = currentContent ? currentContent.split(/\r?\n/) : [];
+
+    for (const entry of entries) {
+      if (!newLines.some(line => line.trim() === entry)) {
+        newLines.push(entry);
+        modified = true;
+      }
+    }
+
+    if (modified || !fs.existsSync(gitignorePath)) {
+      // Keep a clean trailing newline
+      const updatedContent = newLines.join('\n').replace(/\n*$/, '\n');
+      fs.writeFileSync(gitignorePath, updatedContent, 'utf-8');
+    }
+  } catch (err) {
+    console.error(`  🔴 Failed to scaffold base structure: ${err.message}`);
+  }
+}
+
+/**
  * Dynamic Telemetry Registry with Safe 3-Tier Fallback
  * Maps archetype and language stacks to specific, isolated telemetry/playbook templates.
  */
@@ -283,6 +331,9 @@ export function scaffoldSkill(options) {
   } = options;
 
   ensureDirectory(targetDir);
+  if (!isSubSkill) {
+    scaffoldBaseStructure(targetDir);
+  }
   ensureDirectory(path.join(targetDir, 'scripts'));
 
   // 1. Resolve Archetype
@@ -290,7 +341,10 @@ export function scaffoldSkill(options) {
   const profile = ARCHETYPE_PROFILES[resolvedArchetype] || ARCHETYPE_PROFILES.developer;
 
   // Read skill template
-  const tmplPath = path.join(TEMPLATE_DIR, 'skill_template.md');
+  let tmplPath = path.join(TEMPLATE_DIR, `${resolvedArchetype}_skill_template.md`);
+  if (!fs.existsSync(tmplPath)) {
+    tmplPath = path.join(TEMPLATE_DIR, 'skill_template.md');
+  }
   if (!fs.existsSync(tmplPath)) {
     throw new Error(`Template not found: ${tmplPath}`);
   }
@@ -602,6 +656,7 @@ export async function scaffoldSkillSystem(options) {
 
   console.log(`\nScaffolding Coordinated Skill System: ${name}...`);
   ensureDirectory(targetDir);
+  scaffoldBaseStructure(targetDir);
 
   // Read system template
   const tmplPath = path.join(TEMPLATE_DIR, 'system_template.md');
@@ -629,7 +684,7 @@ export async function scaffoldSkillSystem(options) {
     const isGlobal = resolvedChildScopes[s] === '2';
     const linkPath = isGlobal 
       ? path.join(globalConfigBase, 'skills', s, 'SKILL.md') 
-      : `./skills/${s}/SKILL.md`;
+      : `./skillsets/${s}/SKILL.md`;
     return `- [${s}](${linkPath})`;
   }).join('\n');
 
@@ -653,7 +708,7 @@ export async function scaffoldSkillSystem(options) {
   console.log(`  🟢 Created System Manifest: SYSTEM.md`);
 
   // Create local base directories
-  ensureDirectory(path.join(targetDir, 'skills'));
+  ensureDirectory(path.join(targetDir, 'skillsets'));
   ensureDirectory(path.join(targetDir, 'agents'));
 
   // Scaffold top-level Autolearner for the whole System
@@ -665,7 +720,7 @@ export async function scaffoldSkillSystem(options) {
     
     const childTargetSkillDir = isGlobal 
       ? path.join(globalConfigBase, 'skills', childSkill)
-      : path.join(targetDir, 'skills', childSkill);
+      : path.join(targetDir, 'skillsets', childSkill);
 
     const childTargetAgentDir = isGlobal
       ? path.join(globalConfigBase, 'agents', `${childSkill}_agent`)
@@ -802,6 +857,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
   console.log(`📂 Target Path: \x1b[90m${targetDir}\x1b[0m\n`);
 
   ensureDirectory(targetDir);
+  scaffoldBaseStructure(targetDir);
 
   // Write central coordinated playbook files for the team
   const roadmapPath = path.join(targetDir, 'lessons_index.md');
@@ -846,7 +902,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 
   // Set up directory structures and system manifest if running a multi-agent system
   if (blueprint.skills.length > 1 || agentsToScaffold.length > 0) {
-    ensureDirectory(path.join(targetDir, 'skills'));
+    ensureDirectory(path.join(targetDir, 'skillsets'));
     ensureDirectory(path.join(targetDir, 'agents'));
 
     // Write system-wide autolearner
@@ -856,7 +912,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
     const tmplPath = path.join(TEMPLATE_DIR, 'system_template.md');
     if (fs.existsSync(tmplPath)) {
       const template = fs.readFileSync(tmplPath, 'utf-8');
-      const subSkillsList = blueprint.skills.map(s => `- [${s.name}](./skills/${s.name}/SKILL.md)`).join('\n');
+      const subSkillsList = blueprint.skills.map(s => `- [${s.name}](./skillsets/${s.name}/SKILL.md)`).join('\n');
       const subAgentsList = agentsToScaffold.map(a => `- [${a.name}-agent](./agents/${a.name}_agent/AGENT.md)`).join('\n');
 
       let orchestrator = 'system-coordinator';
@@ -882,7 +938,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
   // Traverse skills and scaffold sequentially
   for (const skill of blueprint.skills) {
     const skillDir = (blueprint.skills.length > 1 || agentsToScaffold.length > 0)
-      ? path.join(targetDir, 'skills', skill.name)
+      ? path.join(targetDir, 'skillsets', skill.name)
       : targetDir;
 
     // Scaffolding skill natively

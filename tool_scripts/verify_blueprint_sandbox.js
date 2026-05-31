@@ -42,6 +42,17 @@ function assertNotExists(filePath) {
   console.log(`  ✓ Verified: ${path.basename(filePath)} does not exist.`);
 }
 
+function assertFileContains(filePath, substring) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Assertion failed: File does not exist at ${filePath}`);
+  }
+  const content = fs.readFileSync(filePath, 'utf-8');
+  if (!content.includes(substring)) {
+    throw new Error(`Assertion failed: File ${filePath} does not contain expected substring "${substring}"`);
+  }
+  console.log(`  ✓ Verified file ${path.basename(filePath)} contains: "${substring.trim()}"`);
+}
+
 async function run() {
   console.log("=====================================================");
   console.log("   Running Blueprint E2E Sandbox Scaffolding Tests   ");
@@ -107,17 +118,32 @@ async function run() {
   console.log("\n🔍 Step 3: Asserting file system structure correctness...");
   assertExists(targetProjectDir);
 
+  // Assert Step 1 base structure
+  assertExists(path.join(targetProjectDir, '.sfe-version'));
+  const sfeVersionContent = fs.readFileSync(path.join(targetProjectDir, '.sfe-version'), 'utf-8');
+  if (!sfeVersionContent.includes('0.6.9')) {
+    throw new Error("Assertion failed: .sfe-version does not contain expected lock version '0.6.9'");
+  }
+  assertExists(path.join(targetProjectDir, 'local-workspace/sfe-mock.example'));
+  assertExists(path.join(targetProjectDir, '.gitignore'));
+  const gitignoreContent = fs.readFileSync(path.join(targetProjectDir, '.gitignore'), 'utf-8');
+  if (!gitignoreContent.includes('local-workspace/') || !gitignoreContent.includes('sfe-mock.env')) {
+    throw new Error("Assertion failed: .gitignore is missing local-workspace/ or sfe-mock.env entries");
+  }
+
   // A. Product Manager Skill (web-pm, Node.js runtime)
-  const pmDir = path.join(targetProjectDir, 'skills/web-pm');
+  const pmDir = path.join(targetProjectDir, 'skillsets/web-pm');
   console.log("  Asserting PM Skill folder...");
   assertExists(path.join(pmDir, 'SKILL.md'));
+  assertFileContains(path.join(pmDir, 'SKILL.md'), 'ROM Protocol');
+  assertFileContains(path.join(pmDir, 'SKILL.md'), 'Human-Anchor Memory Guard');
   assertExists(path.join(pmDir, 'lessons_index.md'));
   assertExists(path.join(pmDir, 'playbook.md'));
   assertExists(path.join(pmDir, 'scripts/security_check.js'));
   assertExists(path.join(pmDir, '.github/workflows/security_scan.yml'));
 
   // B. Architect Skill (web-db, Agnostic Default runtime - non-coding)
-  const dbDir = path.join(targetProjectDir, 'skills/web-db');
+  const dbDir = path.join(targetProjectDir, 'skillsets/web-db');
   console.log("  Asserting Architect Skill folder...");
   assertExists(path.join(dbDir, 'SKILL.md'));
   assertExists(path.join(dbDir, 'lessons_index.md'));
@@ -126,9 +152,11 @@ async function run() {
   assertExists(path.join(dbDir, '.github/workflows/security_scan.yml'));
 
   // C. Security Auditor Skill (web-scanner, Python runtime, Custom Exclusions)
-  const scanDir = path.join(targetProjectDir, 'skills/web-scanner');
+  const scanDir = path.join(targetProjectDir, 'skillsets/web-scanner');
   console.log("  Asserting Security Auditor Skill folder...");
   assertExists(path.join(scanDir, 'SKILL.md'));
+  assertFileContains(path.join(scanDir, 'SKILL.md'), 'AST Security Firewalls');
+  assertFileContains(path.join(scanDir, 'SKILL.md'), 'AST Dependency Fallbacks');
   assertExists(path.join(scanDir, 'lessons_index.md'));
   assertExists(path.join(scanDir, 'playbook.md'));
   assertExists(path.join(scanDir, 'scripts/security_check.py'));
@@ -218,9 +246,23 @@ async function run() {
   // Assertions for Compact Scaffold
   assertExists(compactTargetDir);
   assertExists(path.join(compactTargetDir, 'SYSTEM.md'));
-  assertExists(path.join(compactTargetDir, 'skills/python-ui/SKILL.md'));
-  assertExists(path.join(compactTargetDir, 'skills/python-ai/SKILL.md'));
-  assertExists(path.join(compactTargetDir, 'skills/python-db/SKILL.md'));
+
+  // Assert Step 1 base structure
+  assertExists(path.join(compactTargetDir, '.sfe-version'));
+  const compactSfeVersionContent = fs.readFileSync(path.join(compactTargetDir, '.sfe-version'), 'utf-8');
+  if (!compactSfeVersionContent.includes('0.6.9')) {
+    throw new Error("Assertion failed: .sfe-version in compact project does not contain expected lock version '0.6.9'");
+  }
+  assertExists(path.join(compactTargetDir, 'local-workspace/sfe-mock.example'));
+  assertExists(path.join(compactTargetDir, '.gitignore'));
+  const compactGitignoreContent = fs.readFileSync(path.join(compactTargetDir, '.gitignore'), 'utf-8');
+  if (!compactGitignoreContent.includes('local-workspace/') || !compactGitignoreContent.includes('sfe-mock.env')) {
+    throw new Error("Assertion failed: .gitignore in compact project is missing local-workspace/ or sfe-mock.env entries");
+  }
+
+  assertExists(path.join(compactTargetDir, 'skillsets/python-ui/SKILL.md'));
+  assertExists(path.join(compactTargetDir, 'skillsets/python-ai/SKILL.md'));
+  assertExists(path.join(compactTargetDir, 'skillsets/python-db/SKILL.md'));
   
   const agentMdPath = path.join(compactTargetDir, 'agents/python-expert_agent/AGENT.md');
   assertExists(agentMdPath);
