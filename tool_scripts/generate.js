@@ -958,13 +958,96 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
   }
 
   const blueprint = validateBlueprint(rawBlueprint);
-  const targetDir = path.resolve(blueprint.projectName);
+  
+  // Intelligent Path Resolution: Prevent redundant nesting (e.g. CWD/test-app/test-app)
+  const cwd = process.cwd();
+  let targetDir = path.resolve(blueprint.projectName);
+  if (!path.isAbsolute(blueprint.projectName)) {
+    if (path.basename(cwd).toLowerCase() === blueprint.projectName.toLowerCase()) {
+      targetDir = cwd;
+    }
+  }
 
-  // Overwrite Protection (Safety Protocol)
-  if (fs.existsSync(targetDir) && !force) {
-    console.error(`🔴 Aborted: Target project directory already exists at: ${targetDir}`);
-    console.error("To overwrite this folder, execute again with the --force flag.");
-    process.exit(1);
+  // Compile whitelisted agent list first
+  const agentsToScaffold = [];
+  if (blueprint.agents && blueprint.agents.length > 0) {
+    // Blueprint whitelists custom compact agents
+    blueprint.agents.forEach(agent => {
+      agentsToScaffold.push({
+        name: agent.name,
+        description: agent.description,
+        role: agent.role || 'Specialist',
+        allowedSkills: agent.allowedSkills.map(s => String(s).trim())
+      });
+    });
+  } else if (blueprint.skills.length > 1) {
+    // Backward-compatible 1-to-1 default (one agent per skill)
+    blueprint.skills.forEach(skill => {
+      agentsToScaffold.push({
+        name: `${skill.name}-agent`,
+        description: `Specialized agent managing ${skill.name} capabilities.`,
+        role: `${skill.name} specialist`,
+        allowedSkills: [skill.name]
+      });
+    });
+  }
+
+  // Safe Default Merge & Re-scaffolding Cleanup
+  const isMultiAgent = blueprint.skills.length > 1 || agentsToScaffold.length > 0;
+  if (fs.existsSync(targetDir)) {
+    console.log(`⚠️ Target project directory already exists at: ${targetDir}`);
+    
+    const skillsetsDir = path.join(targetDir, 'skillsets');
+    const agentsDir = path.join(targetDir, 'agents');
+
+    if (force) {
+      console.log("⚡ Force mode enabled. Purging existing agents and skillsets folders for a clean rebuild...");
+      if (fs.existsSync(skillsetsDir)) {
+        fs.rmSync(skillsetsDir, { recursive: true, force: true });
+      }
+      if (fs.existsSync(agentsDir)) {
+        fs.rmSync(agentsDir, { recursive: true, force: true });
+      }
+    } else {
+      console.log("📁 Performing a safe, self-cleaning incremental merge...");
+      
+      // Clean up orphaned agents that are no longer present in the new blueprint
+      if (fs.existsSync(agentsDir)) {
+        try {
+          const existingAgentDirs = fs.readdirSync(agentsDir);
+          existingAgentDirs.forEach(dirName => {
+            if (dirName.endsWith('_agent')) {
+              const agentName = dirName.slice(0, -6);
+              const stillExists = agentsToScaffold.some(a => a.name.toLowerCase() === agentName.toLowerCase());
+              if (!stillExists) {
+                const oldAgentPath = path.join(agentsDir, dirName);
+                console.log(`  🗑️ Removing legacy orphaned agent profile: ${dirName}`);
+                fs.rmSync(oldAgentPath, { recursive: true, force: true });
+              }
+            }
+          });
+        } catch (e) {
+          console.warn(`  ⚠️ Failed to scan agents folder: ${e.message}`);
+        }
+      }
+
+      // Clean up orphaned skills that are no longer present in the new blueprint
+      if (fs.existsSync(skillsetsDir)) {
+        try {
+          const existingSkillDirs = fs.readdirSync(skillsetsDir);
+          existingSkillDirs.forEach(dirName => {
+            const stillExists = blueprint.skills.some(s => s.name.toLowerCase() === dirName.toLowerCase());
+            if (!stillExists) {
+              const oldSkillPath = path.join(skillsetsDir, dirName);
+              console.log(`  🗑️ Removing legacy orphaned skill: ${dirName}`);
+              fs.rmSync(oldSkillPath, { recursive: true, force: true });
+            }
+          });
+        } catch (e) {
+          console.warn(`  ⚠️ Failed to scan skillsets folder: ${e.message}`);
+        }
+      }
+    }
   }
 
   console.log(`📂 Project Name: \x1b[36m${path.basename(targetDir)}\x1b[0m`);
@@ -986,36 +1069,16 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 > Coordinated multi-skill DMCP playbook.
 `;
 
-  // Write files
-  fs.writeFileSync(roadmapPath, roadmapContent, 'utf-8');
-  fs.writeFileSync(playbookPath, playbookContent, 'utf-8');
-
-  // Compile whitelisted agent list
-  const agentsToScaffold = [];
-  if (blueprint.agents && blueprint.agents.length > 0) {
-    // Blueprint whitelists custom compact agents
-    blueprint.agents.forEach(agent => {
-      agentsToScaffold.push({
-        name: agent.name,
-        description: agent.description,
-        role: agent.role || 'Specialist',
-        allowedSkills: agent.allowedSkills
-      });
-    });
-  } else if (blueprint.skills.length > 1) {
-    // Backward-compatible 1-to-1 default (one agent per skill)
-    blueprint.skills.forEach(skill => {
-      agentsToScaffold.push({
-        name: `${skill.name}-agent`,
-        description: `Specialized agent managing ${skill.name} capabilities.`,
-        role: `${skill.name} specialist`,
-        allowedSkills: [skill.name]
-      });
-    });
+  // Write files safely (only if they don't exist or if force is enabled, to protect custom user playbooks)
+  if (!fs.existsSync(roadmapPath) || force) {
+    fs.writeFileSync(roadmapPath, roadmapContent, 'utf-8');
+  }
+  if (!fs.existsSync(playbookPath) || force) {
+    fs.writeFileSync(playbookPath, playbookContent, 'utf-8');
   }
 
   // Set up directory structures and system manifest if running a multi-agent system
-  if (blueprint.skills.length > 1 || agentsToScaffold.length > 0) {
+  if (isMultiAgent) {
     ensureDirectory(path.join(targetDir, 'skillsets'));
     ensureDirectory(path.join(targetDir, 'agents'));
 

@@ -193,20 +193,47 @@ async function run() {
   }
   console.log("  ✓ All 3 team skills registered in registry database index!");
 
-  // 4. Test Overwrite Protection (Safety Protocol)
-  console.log("\n🔒 Step 4: Running CLI again without --force to test Overwrite Protection...");
+  // 4. Test Overwrite Protection & Safe Incremental Merge
+  console.log("\n🔒 Step 4: Running CLI again without --force to test Safe Incremental Merge & Self-Cleaning...");
   try {
-    const cmd = `node "${path.resolve(__dirname, '../cli_bin/cli.js')}" --blueprint "${blueprintPath}"`;
+    // Modify blueprintContent to remove the "web-scanner" skill
+    const updatedBlueprintContent = {
+      ...blueprintContent,
+      skills: blueprintContent.skills.filter(s => s.name !== 'web-scanner')
+    };
+    if (blueprintContent.agents) {
+      updatedBlueprintContent.agents = blueprintContent.agents.filter(a => a.name !== 'web-scanner-agent');
+    }
+    const updatedBlueprintPath = path.join(SCRATCH_DIR, 'test_blueprint_team_updated.json');
+    fs.writeFileSync(updatedBlueprintPath, JSON.stringify(updatedBlueprintContent, null, 2), 'utf-8');
+
+    const cmd = `node "${path.resolve(__dirname, '../cli_bin/cli.js')}" --blueprint "${updatedBlueprintPath}"`;
     execSync(cmd, { 
       env: { ...process.env, SENFIDE_TEST_DIR: REGISTRY_DIR },
       stdio: 'ignore' 
     });
-    throw new Error("Safety breach: CLI should have exited with code 1 on directory overwrite attempt!");
-  } catch (err) {
-    if (err.status !== 1) {
-      throw new Error(`Expected exit status 1 on overwrite abort, but got: ${err.status}`);
+    
+    // Assert that the orphaned skillset and agent folders were successfully purged!
+    const legacySkillFolder = path.join(targetProjectDir, 'skillsets/web-scanner');
+    const legacyAgentFolder = path.join(targetProjectDir, 'agents/web-scanner-agent_agent');
+    
+    if (fs.existsSync(legacySkillFolder)) {
+      throw new Error("Assertion failed: Safe incremental merge left behind legacy orphaned skill folder!");
     }
-    console.log("  ✓ Overwrite protection successfully caught collision and aborted safely with Exit Code 1!");
+    if (fs.existsSync(legacyAgentFolder)) {
+      throw new Error("Assertion failed: Safe incremental merge left behind legacy orphaned agent folder!");
+    }
+    
+    // Assert that the remaining folders still exist
+    assertExists(path.join(targetProjectDir, 'skillsets/web-pm'));
+    assertExists(path.join(targetProjectDir, 'skillsets/web-db'));
+    assertExists(path.join(targetProjectDir, 'agents/web-pm-agent_agent'));
+    assertExists(path.join(targetProjectDir, 'agents/web-db-agent_agent'));
+    
+    console.log("  ✓ Safe incremental merge successfully executed and purged orphaned directories without --force!");
+  } catch (err) {
+    console.error("🔴 Incremental merge test failed:", err.message);
+    throw err;
   }
 
   // 5. Test Force Override Option
