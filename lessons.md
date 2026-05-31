@@ -25,6 +25,8 @@
 - PowerShell Statement Separators: Windows PowerShell throws syntax parsing errors on double ampersands (`&&`). Command-line sequences targeting Windows hosts must strictly join statements using semicolons (`;`) or run as separate command executions.
 - Safe Self-Cleaning Defaults vs Force Fallback: Scaffolding and compilation processes must perform a safe, self-cleaning incremental merge by default, dynamically purging orphaned agents and skills. Reserve the `--force` flag strictly as a fallback option for complete clean-slate purges.
 - Language Alignment and Anti-Bloviating Tone Constraints: Instruct agent roles to dynamically detect and match the user's preferred language, and strictly forbid pleasantries, polite filler, or conversational bloviating in favor of high-density bullet points or minimal direct sentences.
+- Interviewer Tone Manifest Purging: To completely eliminate conversational bloviating and pleasantries during onboarding, command manifests (such as sfe-interview and sfe-blueprint) must be strictly purged of soft tone descriptors (e.g., 'friendly', 'warm', 'enthusiastic') and bound to concise, direct, language-adaptive role instructions.
+
 
 
 
