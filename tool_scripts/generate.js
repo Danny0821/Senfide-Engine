@@ -92,8 +92,119 @@ SFE_MOCK_API_SECRET=mock_secret_abc789
       const updatedContent = newLines.join('\n').replace(/\n*$/, '\n');
       fs.writeFileSync(gitignorePath, updatedContent, 'utf-8');
     }
+
+    // 4. Run IDE prober and cache environment capabilities
+    probeIdeEnvironment(targetDir);
   } catch (err) {
     console.error(`  🔴 Failed to scaffold base structure: ${err.message}`);
+  }
+}
+
+/**
+ * Probes the host system and active IDE channels to map and cache environment capabilities.
+ * @param {string} targetDir Target project directory.
+ */
+function probeIdeEnvironment(targetDir) {
+  const probeResult = {
+    editor: 'generic',
+    supportsRichLinks: false,
+    os: process.platform,
+    preferredPathFormat: 'posix',
+    detectedProcesses: [],
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    // 1. Channel 1: Environment Variables
+    const termProgram = (process.env.TERM_PROGRAM || '').toLowerCase();
+    const isVscodeEnv = termProgram.includes('vscode') || !!process.env.VSCODE_GIT_IPC_HANDLE;
+    const isCursorEnv = termProgram.includes('cursor') || !!process.env.CURSOR_APP_PATH;
+    const isWindsurfEnv = termProgram.includes('windsurf');
+
+    if (isCursorEnv) {
+      probeResult.editor = 'cursor';
+      probeResult.supportsRichLinks = true;
+    } else if (isWindsurfEnv) {
+      probeResult.editor = 'windsurf';
+      probeResult.supportsRichLinks = true;
+    } else if (isVscodeEnv) {
+      probeResult.editor = 'vscode';
+      probeResult.supportsRichLinks = true;
+    }
+
+    // 2. Channel 2: Configuration Signature Probe
+    const probeDirs = [targetDir, path.resolve(targetDir, '..'), process.cwd()];
+    for (const dir of probeDirs) {
+      if (!fs.existsSync(dir)) continue;
+      
+      if (fs.existsSync(path.join(dir, '.cursorrules')) || fs.existsSync(path.join(dir, '.cursor'))) {
+        probeResult.editor = 'cursor';
+        probeResult.supportsRichLinks = true;
+      }
+      if (fs.existsSync(path.join(dir, '.windsurf')) || fs.existsSync(path.join(dir, '.windsurf/'))) {
+        probeResult.editor = 'windsurf';
+        probeResult.supportsRichLinks = true;
+      }
+      if (fs.existsSync(path.join(dir, '.vscode')) || fs.existsSync(path.join(dir, '.vscode/settings.json'))) {
+        if (probeResult.editor === 'generic') {
+          probeResult.editor = 'vscode';
+          probeResult.supportsRichLinks = true;
+        }
+      }
+    }
+
+    // 3. Channel 3: Process Tree Audit
+    let processOutput = '';
+    if (process.platform === 'win32') {
+      try {
+        processOutput = execSync('tasklist', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      } catch (e) {
+        // tasklist not available or failed
+      }
+    } else {
+      try {
+        processOutput = execSync('ps -ax || ps -e', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      } catch (e) {
+        // ps not available or failed
+      }
+    }
+
+    if (processOutput) {
+      const lowerOutput = processOutput.toLowerCase();
+      const processMap = {
+        'cursor': ['cursor.exe', 'cursor'],
+        'vscode': ['code.exe', 'code'],
+        'windsurf': ['windsurf.exe', 'windsurf'],
+        'claudecode': ['claudecode', 'claude']
+      };
+
+      for (const [editorName, signatures] of Object.entries(processMap)) {
+        if (signatures.some(sig => lowerOutput.includes(sig))) {
+          probeResult.detectedProcesses.push(editorName);
+          // Prioritize active process signatures over env vars
+          if (editorName === 'cursor') {
+            probeResult.editor = 'cursor';
+            probeResult.supportsRichLinks = true;
+          } else if (editorName === 'windsurf') {
+            probeResult.editor = 'windsurf';
+            probeResult.supportsRichLinks = true;
+          } else if (editorName === 'claudecode') {
+            probeResult.editor = 'claudecode';
+            probeResult.supportsRichLinks = false;
+          } else if (editorName === 'vscode' && probeResult.editor === 'generic') {
+            probeResult.editor = 'vscode';
+            probeResult.supportsRichLinks = true;
+          }
+        }
+      }
+    }
+
+    // Write cache to local-workspace/sfe-probe.json
+    const probePath = path.join(targetDir, 'local-workspace/sfe-probe.json');
+    ensureDirectory(path.dirname(probePath));
+    fs.writeFileSync(probePath, JSON.stringify(probeResult, null, 2), 'utf-8');
+  } catch (err) {
+    console.error(`  🔴 Failed to run IDE prober: ${err.message}`);
   }
 }
 

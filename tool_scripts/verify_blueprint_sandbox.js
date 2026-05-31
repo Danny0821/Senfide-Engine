@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
+import { execSync, exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +24,19 @@ function cleanup() {
       console.log("🧹 Cleaned up old test directories.");
     } catch (e) {
       console.warn("⚠️ Warning: Failed to fully clean old test registry:", e.message);
+    }
+  }
+  if (fs.existsSync(SCRATCH_DIR)) {
+    try {
+      const files = fs.readdirSync(SCRATCH_DIR);
+      for (const file of files) {
+        if (file.endsWith('.lock')) {
+          fs.unlinkSync(path.join(SCRATCH_DIR, file));
+          console.log(`🧹 Cleaned up stale lock file: ${file}`);
+        }
+      }
+    } catch (e) {
+      // Best-effort cleanup
     }
   }
 }
@@ -125,6 +138,11 @@ async function run() {
     throw new Error("Assertion failed: .sfe-version does not contain expected lock version '0.6.9'");
   }
   assertExists(path.join(targetProjectDir, 'local-workspace/sfe-mock.example'));
+  assertExists(path.join(targetProjectDir, 'local-workspace/sfe-probe.json'));
+  const targetProbe = JSON.parse(fs.readFileSync(path.join(targetProjectDir, 'local-workspace/sfe-probe.json'), 'utf-8'));
+  if (!targetProbe.os || !targetProbe.editor || !targetProbe.timestamp) {
+    throw new Error("Assertion failed: sfe-probe.json is missing required attributes in standard target.");
+  }
   assertExists(path.join(targetProjectDir, '.gitignore'));
   const gitignoreContent = fs.readFileSync(path.join(targetProjectDir, '.gitignore'), 'utf-8');
   if (!gitignoreContent.includes('local-workspace/') || !gitignoreContent.includes('sfe-mock.env')) {
@@ -254,6 +272,11 @@ async function run() {
     throw new Error("Assertion failed: .sfe-version in compact project does not contain expected lock version '0.6.9'");
   }
   assertExists(path.join(compactTargetDir, 'local-workspace/sfe-mock.example'));
+  assertExists(path.join(compactTargetDir, 'local-workspace/sfe-probe.json'));
+  const compactProbe = JSON.parse(fs.readFileSync(path.join(compactTargetDir, 'local-workspace/sfe-probe.json'), 'utf-8'));
+  if (!compactProbe.os || !compactProbe.editor || !compactProbe.timestamp) {
+    throw new Error("Assertion failed: sfe-probe.json is missing required attributes in compact target.");
+  }
   assertExists(path.join(compactTargetDir, '.gitignore'));
   const compactGitignoreContent = fs.readFileSync(path.join(compactTargetDir, '.gitignore'), 'utf-8');
   if (!compactGitignoreContent.includes('local-workspace/') || !compactGitignoreContent.includes('sfe-mock.env')) {
@@ -273,6 +296,45 @@ async function run() {
     throw new Error("Assertion failed: Scaffolded compact AGENT.md missing whitelisted allowedSkills YAML items.");
   }
   console.log("  ✓ Verified: Compact agent whitelists all three skills correctly inside AGENT.md!");
+
+  // 6.5 Verifying Concurrency File-Locking Semaphore
+  console.log("\n🔒 Step 6.5: Verifying Concurrency File-Locking Semaphore...");
+  const lockFilePath = `${compactBlueprintPath}.lock`;
+
+  // 1. Manually create the lock file to block the CLI execution
+  fs.writeFileSync(lockFilePath, 'locked-by-test', 'utf-8');
+  console.log("  ✓ Created artificial lock file to block CLI execution.");
+
+  const startTime = Date.now();
+
+  // 2. Start the CLI command in the background (which should retry and wait for the lock to clear)
+  const childProcess = exec(`node "${path.resolve(__dirname, '../cli_bin/cli.js')}" --blueprint "${compactBlueprintPath}" --force`, {
+    env: { ...process.env, SENFIDE_TEST_DIR: REGISTRY_DIR }
+  });
+
+  // 3. Sleep for a short duration, then release the lock manually
+  await new Promise(resolve => setTimeout(resolve, 300));
+  if (fs.existsSync(lockFilePath)) {
+    fs.unlinkSync(lockFilePath);
+    console.log("  ✓ Released lock file manually. CLI process should now resume.");
+  }
+
+  // 4. Wait for the CLI background process to complete successfully
+  await new Promise((resolve, reject) => {
+    childProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Background CLI failed with exit code: ${code}`));
+      }
+    });
+  });
+
+  const duration = Date.now() - startTime;
+  if (duration < 300) {
+    throw new Error(`Assertion failed: CLI process did not wait for the lock. Execution finished too fast (${duration}ms).`);
+  }
+  console.log(`  ✓ Concurrency queued successfully! Process waited for lock and completed. (Duration: ${duration}ms)`);
 
   // Clean up compact files
   if (fs.existsSync(compactBlueprintPath)) {

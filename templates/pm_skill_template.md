@@ -36,6 +36,11 @@ requirements:
   - **Loop Limit**: Max **10 retries** for polling loops, status checks, or wait cycles. If not complete after 10 iterations, stop and ask user for directions.
   - **ROM Protocol**: Treat chat history strictly as Read-Only Memory (ROM). Never ask or suggest context pruning, deletion, or resetting.
   - **Human-Anchor Memory Guard**: Persist and synchronize all project states, milestones, priorities, and backlog tickets strictly to disk in `docs/ROADMAP.md` or `skillsets/pm/BACKLOG.md`. Never rely on session memory.
+  - **Multi-Channel Link Prompting & Path Normalization**:
+    1. Read `local-workspace/sfe-probe.json` to detect active IDE capabilities.
+    2. If `supportsRichLinks` is `true`, format all target file references using Cursor/VS Code rich links with the `@` symbol (e.g. `@docs/ROADMAP.md` or `@src/types/types.ts`).
+    3. If `supportsRichLinks` is `false`, format all target file references using literal POSIX-standard forward-slash paths (e.g. `[ROADMAP.md](file:///absolute/path/to/docs/ROADMAP.md)` or standard markdown links).
+    4. Force all links/paths to POSIX-standard forward slashes (`/`), even on Windows host environments.
   </scope_constraints>
 </instructions>
 

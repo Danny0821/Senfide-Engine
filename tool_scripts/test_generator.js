@@ -71,6 +71,11 @@ async function runTests() {
     assertExists(path.join(systemDir, '.sfe-version'));
     assertFileContains(path.join(systemDir, '.sfe-version'), '0.6.9');
     assertExists(path.join(systemDir, 'local-workspace/sfe-mock.example'));
+    assertExists(path.join(systemDir, 'local-workspace/sfe-probe.json'));
+    const probeContent = JSON.parse(fs.readFileSync(path.join(systemDir, 'local-workspace/sfe-probe.json'), 'utf-8'));
+    if (!probeContent.os || !probeContent.editor || !probeContent.timestamp) {
+      throw new Error("Assertion failed: sfe-probe.json is missing required attributes in programmatic target.");
+    }
     assertExists(path.join(systemDir, '.gitignore'));
     assertFileContains(path.join(systemDir, '.gitignore'), 'local-workspace/');
     assertFileContains(path.join(systemDir, '.gitignore'), 'sfe-mock.env');

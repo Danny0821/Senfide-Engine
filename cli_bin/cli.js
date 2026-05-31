@@ -19,6 +19,80 @@ import { loadIndex, searchSkills, scanWorkspace, unregisterSkill } from '../tool
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Sleeps for a specified number of milliseconds.
+ * @param {number} ms Milliseconds to sleep.
+ * @returns {Promise<void>}
+ */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Active lock registry to track locks held by this process.
+ */
+const activeLocks = new Set();
+
+// Register process exit hook to cleanly release all locks sync on termination
+process.on('exit', () => {
+  for (const lock of activeLocks) {
+    try {
+      if (fs.existsSync(lock)) {
+        fs.unlinkSync(lock);
+      }
+    } catch (e) {
+      // Best-effort cleanup during exit
+    }
+  }
+});
+
+/**
+ * Atomically acquires a file lock using Node's O_CREAT | O_EXCL ('wx') flag.
+ * Implements exponential backoff retries to queue concurrent processes.
+ * @param {string} lockPath - Path to the lock file.
+ * @param {number} maxRetries - Maximum number of retries before timeout.
+ * @returns {Promise<boolean>} Resolves to true when lock is acquired.
+ */
+async function acquireFileLock(lockPath, maxRetries = 10) {
+  let attempt = 0;
+  let delay = 50; // Initial delay in ms
+
+  while (attempt < maxRetries) {
+    try {
+      // wx flag atomically fails if file exists
+      const fd = fs.openSync(lockPath, 'wx');
+      fs.closeSync(fd);
+      activeLocks.add(lockPath);
+      return true;
+    } catch (err) {
+      if (err.code === 'EEXIST') {
+        attempt++;
+        // Exponential backoff with jitter
+        const jitter = Math.floor(Math.random() * 20);
+        const backoff = delay * Math.pow(2, attempt) + jitter;
+        console.warn(`⚠️ File locked: ${path.basename(lockPath)}. Retrying in ${backoff}ms (Attempt ${attempt}/${maxRetries})...`);
+        await sleep(backoff);
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error(`Timeout acquiring lock on: ${lockPath}`);
+}
+
+/**
+ * Releases the file lock by unlinking the lock file.
+ * @param {string} lockPath - Path to the lock file.
+ */
+function releaseFileLock(lockPath) {
+  try {
+    if (fs.existsSync(lockPath)) {
+      fs.unlinkSync(lockPath);
+    }
+    activeLocks.delete(lockPath);
+  } catch (err) {
+    console.error(`🔴 Failed to release lock on ${lockPath}: ${err.message}`);
+  }
+}
+
 // Helper to print CLI help menu
 function printHelp() {
   console.log(`
@@ -145,6 +219,9 @@ async function handleCommands() {
       process.exit(1);
     }
 
+    const lockPath = `${absolutePath}.lock`;
+    await acquireFileLock(lockPath);
+
     // Dynamic import to execute scaffoldFromBlueprint in scripts/generate.js
     const generatePath = path.resolve(__dirname, '../tool_scripts/generate.js');
     const generateUrl = pathToFileURL(generatePath).href;
@@ -153,11 +230,13 @@ async function handleCommands() {
       const module = await import(generateUrl);
       if (module.scaffoldFromBlueprint) {
         await module.scaffoldFromBlueprint(absolutePath, options.force);
+        releaseFileLock(lockPath);
         process.exit(0);
       } else {
         throw new Error("scaffoldFromBlueprint() not exported in scripts/generate.js.");
       }
     } catch (err) {
+      releaseFileLock(lockPath);
       console.error("🔴 Blueprint scaffolding failed:", err.message);
       process.exit(1);
     }
@@ -218,6 +297,9 @@ async function handleCommands() {
       process.exit(1);
     }
 
+    const lockPath = `${absoluteScanPath}.lock`;
+    await acquireFileLock(lockPath);
+
     console.log(`\n📁 Scanning recursively for SKILL.md files: ${absoluteScanPath}...`);
     try {
       const registered = scanWorkspace(absoluteScanPath);
@@ -233,10 +315,13 @@ async function handleCommands() {
         console.log(`------------------------------------------------------------------`);
         console.log(`Success: Registered ${registered.length} new skill(s) globally.`);
       }
+      releaseFileLock(lockPath);
+      process.exit(0);
     } catch (err) {
+      releaseFileLock(lockPath);
       console.error("🔴 Workspace scan failed:", err.message);
+      process.exit(1);
     }
-    process.exit(0);
   }
 
   // 4.5 Remove Command
