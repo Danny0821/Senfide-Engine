@@ -1,7 +1,7 @@
 # Antigravity 2.0 Global Command Installer (PowerShell)
 # 
 # Install globally by running this one-liner in your PowerShell terminal:
-# irm https://raw.githubusercontent.com/Danny0821/skills-training/master/installers/install.ps1 | iex
+# irm https://raw.githubusercontent.com/Danny0821/Senfide-Engine/master/installers/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
@@ -34,7 +34,7 @@ try {
     # 3. Source manifest deployment
     Write-Host "`nStep 3: Deploying command manifests..." -ForegroundColor Yellow
     
-    $githubRawBase = "https://raw.githubusercontent.com/Danny0821/skills-training/master"
+    $githubRawBase = "https://raw.githubusercontent.com/Danny0821/Senfide-Engine/master"
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
     foreach ($dir in $globalSkillsDirs) {

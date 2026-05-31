@@ -21,7 +21,7 @@ Run instantly system-wide via a global installation, or clone the repository to 
 Install the generator globally directly from GitHub to configure both the system-wide CLI and native slash commands instantly:
 ```bash
 # Install system-wide CLI & register all native slash commands globally
-npm install -g github:Danny0821/skills-training#master
+npm install -g github:Danny0821/Senfide-Engine#master
 ```
 > [!NOTE]
 > This command automatically triggers a `postinstall` synchronization, linking `/sfe-gen`, `/sfe-interview`, and `/sfe-blueprint` native slash commands directly into your AI Agent chat environment configuration directories, delivering a zero-keyboard setup experience.
@@ -30,8 +30,8 @@ npm install -g github:Danny0821/skills-training#master
 If you plan to customize templates or contribute to the `Senfide Engine`, clone the repository and run interactive setups locally:
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Danny0821/skills-training.git
-cd skills-training
+git clone https://github.com/Danny0821/Senfide-Engine.git
+cd Senfide-Engine
 
 # 2. Run setup
 npm install

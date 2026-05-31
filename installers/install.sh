@@ -3,7 +3,7 @@
 # Antigravity 2.0 Global Command Installer (Bash)
 # 
 # Install globally by running this one-liner in your terminal:
-# curl -fsSL https://raw.githubusercontent.com/Danny0821/skills-training/master/installers/install.sh | bash
+# curl -fsSL https://raw.githubusercontent.com/Danny0821/Senfide-Engine/master/installers/install.sh | bash
 
 set -e
 
@@ -42,7 +42,7 @@ GLOBAL_SKILLS_DIRS=(
 # 3. Source manifest deployment
 echo -e "\n${YELLOW}Step 3: Deploying command manifests...${NC}"
 
-GITHUB_RAW_BASE="https://raw.githubusercontent.com/Danny0821/skills-training/master"
+GITHUB_RAW_BASE="https://raw.githubusercontent.com/Danny0821/Senfide-Engine/master"
 
 for dir in "${GLOBAL_SKILLS_DIRS[@]}"; do
     echo -e "  Synchronizing manifests to: $dir"

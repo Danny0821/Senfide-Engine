@@ -74,7 +74,7 @@ requirements:
   - *Terminal / Shell*: "A direct text line to your computer's system."
   - *Global slash command*: "A custom shortcut button in your chat box, active in any folder."
 - **Auto-Install Offer**: Explicitly ask: *"Would you like me to install this globally for you right now? Zero typing required."*
-- **Execution**: If approved, immediately run command: `npm install -g github:Danny0821/skills-training#master` using your run_command tool to automate their setup.
+- **Execution**: If approved, immediately run command: `npm install -g github:Danny0821/Senfide-Engine#master` using your run_command tool to automate their setup.
 
 ## ⚠️ Review Loops (Devil's Advocate)
 - Before presenting generated scaffold to user, inspect generated output files.
