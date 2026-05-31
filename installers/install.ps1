@@ -57,13 +57,14 @@ try {
         $genSkillPath = Join-Path $genDir "SKILL.md"
         $genUrl = "$githubRawBase/command_manifests/generate.md"
         Invoke-WebRequest -Uri $genUrl -OutFile $genSkillPath -UseBasicParsing
-        Write-Host "    ✓ Registered /generate command" -ForegroundColor Green
+        Write-Host "    ✓ Registered /sfe-gen command" -ForegroundColor Green
 
         # 3b. Install /interview (agentic-interviewer) command
         $intDir = Join-Path $dir "agentic-interviewer"
-        if (-not (Test-Path $intDir)) {
-            New-Item -ItemType Directory -Force -Path $intDir | Out-Null
+        if (Test-Path $intDir) {
+            Remove-Item -Path $intDir -Recurse -Force | Out-Null
         }
+        New-Item -ItemType Directory -Force -Path $intDir | Out-Null
         
         $filesToFetch = @("SKILL.md", "interview.json", "lessons_index.md", "playbook.md")
         foreach ($file in $filesToFetch) {
@@ -71,26 +72,27 @@ try {
             $fileUrl = "$githubRawBase/command_manifests/agentic-interviewer/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $targetFilePath -UseBasicParsing
         }
-        Write-Host "    ✓ Registered /interview command" -ForegroundColor Green
+        Write-Host "    ✓ Registered /sfe-interview command" -ForegroundColor Green
 
         # 3c. Install /grill-blueprint (grill-blueprint) command
         $bluDir = Join-Path $dir "grill-blueprint"
-        if (-not (Test-Path $bluDir)) {
-            New-Item -ItemType Directory -Force -Path $bluDir | Out-Null
+        if (Test-Path $bluDir) {
+            Remove-Item -Path $bluDir -Recurse -Force | Out-Null
         }
+        New-Item -ItemType Directory -Force -Path $bluDir | Out-Null
         
         foreach ($file in $filesToFetch) {
             $targetFilePath = Join-Path $bluDir $file
             $fileUrl = "$githubRawBase/command_manifests/grill-blueprint/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $targetFilePath -UseBasicParsing
         }
-        Write-Host "    ✓ Registered /grill-blueprint command" -ForegroundColor Green
+        Write-Host "    ✓ Registered /sfe-blueprint command" -ForegroundColor Green
     }
 
     Write-Host "`n=========================================================" -ForegroundColor Green
     Write-Host "🟢 Success! System-wide registration complete." -ForegroundColor Green
     Write-Host "`n✨ The native slash commands are now active globally!" -ForegroundColor Green
-    Write-Host "👉 You can now type '/generate', '/interview', or '/grill-blueprint' inside your Windows agy client." -ForegroundColor Green
+    Write-Host "👉 You can now type '/sfe-gen', '/sfe-interview', or '/sfe-blueprint' inside your Windows agy client." -ForegroundColor Green
     Write-Host "=========================================================" -ForegroundColor Green
 
 } catch {
