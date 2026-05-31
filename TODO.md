@@ -125,3 +125,17 @@ Natively support grouping multiple distinct skills under a single, highly capabl
 - `[x]` **Declarative `agents` Blueprint Schema:** Add a custom `agents` definition block to the blueprint JSON format mapping agent names to multiple `allowedSkills` (e.g. `["python-ui", "python-ai"]`).
 - `[x]` **Multi-Skill Agent Scaffolder:** Upgrade `scaffoldFromBlueprint` to parse this block and write corresponding whitelisted `AGENT.md` profiles and the orchestrating `SYSTEM.md` file.
 - `[x]` **Dynamic Density & Cohesive Grouping Rules:** Upgraded both `/interview` and `/grill-blueprint` playbooks to completely automate agent-skill layouts using Language Cohesion, Functional Boundaries, and a Strict Grouping Firewall, eliminating the specialized-vs-compact team questions.
+
+---
+
+## 👥 Release 0.7.1: Agentic-Native Orchestration & Multi-Archetype Gating [IN PROGRESS]
+
+### Goal
+Replace traditional, human-centric management overhead with an Agentic-Native PM validation pipeline (GIST hypothesis steps, token budgeting, and topological interface gating) and map the 5 remaining archetypes to native agentic validation standards.
+
+### Tasks
+- `[ ]` **GIST-Driven Agentic Validation (`pm`):** Force PM blueprints to output `ROADMAP.md` as milestone flows and `BACKLOG.md` as hypothesis-validation steps instead of flat task outputs.
+- `[ ]` **Programmatic Token Budgeting:** Implement strict execution loop limit controls in playbook prompts to act as quantitative agent "appetites".
+- `[ ]` **Topological Interface Gating:** Force dev archetypes to compile and assert against locked DDL/API schemas output by the `architect` prior to writing business logic.
+- `[ ]` **5-Archetype Agentic-Native Specs:** Formulate and document standard playbook triggers, validations, and bounds for Architect, DevOps, Developer, QA, and Auditor.
+
