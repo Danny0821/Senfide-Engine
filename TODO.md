@@ -142,4 +142,29 @@ Replace traditional, human-centric management overhead with an Agentic-Native PM
 ### Architecture Consensus
 * **Hybrid Approach Locked:** The core engine codebase structurally hardcodes and enforces all safety boundaries (e.g., standard `sfe-mock.env` / `sfe-mock.example` credentials firewalls, absolute directory layouts, and UPA XML prompt wrappers), while the LLM blueprint dynamically hydrates specific tech-stack files, types, compile validators, and chaos test harnesses.
 
+---
+
+## 🤖 Release 0.7.2: PM Orchestrator & Hub-and-Spoke Execution
+
+### Goal
+Mitigate context window decay, attention degradation, and token bloat by transitioning the PM from a flat-context manager into an autonomous central routing Hub that spawns, manages, and prunes isolated worker subagents.
+
+### Tasks
+- `[ ]` **Dynamic Subagent Spawning:** Configure the PM to spawn targeted Developer, DevOps, and QA subagents programmatically with strict workspace isolation.
+- `[ ]` **Telemetry Context Pruning:** Implement aggressive context reduction rules where the PM purges raw terminal outputs and aggregates only high-density, Caveman-styled outcomes.
+- `[ ]` **Token-Appetite Guardrails:** Set strict API call limits per subagent invocation to prevent infinite diagnostic feedback loops.
+
+---
+
+## 🎨 Release 0.7.3: Ecosystem Expansion & Specialist Agents
+
+### Goal
+Expand the Senfide Engine ecosystem with specialized, stack-constrained visualizers, deep sandbox crawlers, and isolated package migrators.
+
+### Tasks
+- `[ ]` **UI/UX Stack Previewer (`ui-advisor`):** Scaffold a visualizer agent that reads stack constraints and generates mock layouts restricted to that stack's syntax (e.g. WPF XAML vs. JSX Tailwind) and compiles a local `sfe-mock-preview.html` file.
+- `[ ]` **External Knowledge Crawlers (`researcher`):** Establish a researcher agent that crawls external documentations and local legacy codebases, outputting a high-density, AST-accurate "API Cheat-Sheet" to inject directly into developer contexts.
+- `[ ]` **Isolated Package Migrator (`migrator`):** Introduce a dependency updater that scans package locks, executes security audits, resolves version conflicts, and refactors imports in isolation.
+
+
 
