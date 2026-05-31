@@ -243,12 +243,12 @@ Automatically generated in newly scaffolded skill directories, customized to the
 
 ## 🤖 11. Agentic Interviewing & Conversational Scaffolding (Release 0.6.9)
 
-Introduces conversational scaffolding utilizing the Agentic Interview Protocol (`/interview` and `/grill-blueprint`) and non-interactive JSON blueprint declarations (`--blueprint`).
+Introduces conversational scaffolding utilizing the Agentic Interview Protocol (`/sfe-interview` and `/sfe-blueprint`) and non-interactive JSON blueprint declarations (`--blueprint`).
 
 ### 1. Conversational Agentic Playbooks
 The interview logic is split into two separate directories under `command_manifests/` to comply with the Gemini parser, which registers only the first trigger specified in a skill folder's `SKILL.md` frontmatter:
-* **`/sfe-interview`**: Located at `command_manifests/agentic-interviewer/` (trigger `/sfe-interview`). It conducts an XML-guided UPA interview, asking jargon-free business questions (scoping project goals, roles, and environments) and automatically maps replies to DevTeam archetypes.
-* **`/sfe-blueprint`**: Located at `command_manifests/grill-blueprint/` (trigger `/sfe-blueprint`). It serves as a direct alternative shortcut to initiate the same interactive blueprint design and scaffolding workflow.
+* **`/sfe-interview`**: Located at `command_manifests/sfe-interview/` (trigger `/sfe-interview`). It conducts an XML-guided UPA interview, asking jargon-free business questions (scoping project goals, roles, and environments) and automatically maps replies to DevTeam archetypes.
+* **`/sfe-blueprint`**: Located at `command_manifests/sfe-blueprint/` (trigger `/sfe-blueprint`). It serves as a direct alternative shortcut to initiate the same interactive blueprint design and scaffolding workflow.
 * **Synthesis**: Synthesizes the coordinated multi-agent team blueprint JSON and writes it to `scratch/blueprint.json`.
 
 ### 2. Multi-Skill JSON Blueprint Schema

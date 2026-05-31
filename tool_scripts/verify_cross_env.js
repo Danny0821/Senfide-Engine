@@ -31,9 +31,9 @@ try {
 
     // Assert that the command manifests exist in all 4 global paths
     globalSkillsDirs.forEach(dir => {
-      const commandFile = path.join(dir, 'generate/SKILL.md');
-      const interviewDir = path.join(dir, 'agentic-interviewer');
-      const blueprintDir = path.join(dir, 'grill-blueprint');
+      const commandFile = path.join(dir, 'sfe-gen/SKILL.md');
+      const interviewDir = path.join(dir, 'sfe-interview');
+      const blueprintDir = path.join(dir, 'sfe-blueprint');
 
       if (!fs.existsSync(commandFile)) {
         throw new Error(`🔴 Failed: Manifest missing in directory ${dir}!`);

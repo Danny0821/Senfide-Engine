@@ -51,24 +51,30 @@ for dir in "${GLOBAL_SKILLS_DIRS[@]}"; do
     # Clean legacy flat generate.md file
     rm -f "$dir/generate.md"
 
-    # 3a. Install /generate command
-    mkdir -p "$dir/generate"
-    curl -fsSL "$GITHUB_RAW_BASE/command_manifests/generate.md" -o "$dir/generate/SKILL.md"
+    # Clean old legacy folders
+    rm -rf "$dir/generate"
+    rm -rf "$dir/agentic-interviewer"
+    rm -rf "$dir/grill-blueprint"
+
+    # 3a. Install /sfe-gen command
+    rm -rf "$dir/sfe-gen"
+    mkdir -p "$dir/sfe-gen"
+    curl -fsSL "$GITHUB_RAW_BASE/command_manifests/sfe-gen/SKILL.md" -o "$dir/sfe-gen/SKILL.md"
     echo -e "    ${GREEN}✓ Registered /sfe-gen command${NC}"
 
-    # 3b. Install /interview (agentic-interviewer) command
-    rm -rf "$dir/agentic-interviewer"
-    mkdir -p "$dir/agentic-interviewer"
+    # 3b. Install /sfe-interview command
+    rm -rf "$dir/sfe-interview"
+    mkdir -p "$dir/sfe-interview"
     for file in "SKILL.md" "interview.json" "lessons_index.md" "playbook.md"; do
-        curl -fsSL "$GITHUB_RAW_BASE/command_manifests/agentic-interviewer/$file" -o "$dir/agentic-interviewer/$file"
+        curl -fsSL "$GITHUB_RAW_BASE/command_manifests/sfe-interview/$file" -o "$dir/sfe-interview/$file"
     done
     echo -e "    ${GREEN}✓ Registered /sfe-interview command${NC}"
 
-    # 3c. Install /grill-blueprint (grill-blueprint) command
-    rm -rf "$dir/grill-blueprint"
-    mkdir -p "$dir/grill-blueprint"
+    # 3c. Install /sfe-blueprint command
+    rm -rf "$dir/sfe-blueprint"
+    mkdir -p "$dir/sfe-blueprint"
     for file in "SKILL.md" "interview.json" "lessons_index.md" "playbook.md"; do
-        curl -fsSL "$GITHUB_RAW_BASE/command_manifests/grill-blueprint/$file" -o "$dir/grill-blueprint/$file"
+        curl -fsSL "$GITHUB_RAW_BASE/command_manifests/sfe-blueprint/$file" -o "$dir/sfe-blueprint/$file"
     done
     echo -e "    ${GREEN}✓ Registered /sfe-blueprint command${NC}"
 done

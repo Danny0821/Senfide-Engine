@@ -1,5 +1,5 @@
 ---
-name: "grill-blueprint"
+name: "sfe-blueprint"
 description: "Conversational onboarding interviewer that grills you about your project and scaffolds coordinated teams."
 version: "0.1.0"
 triggers:

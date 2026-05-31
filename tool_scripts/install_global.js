@@ -31,9 +31,9 @@ const GLOBAL_SKILLS_DIRS = [
 const GLOBAL_BIN_DIR = path.resolve(os.homedir(), '.gemini/config/bin');
 
 // Source paths relative to package root (supports npx and local runs)
-const LOCAL_COMMAND_PATH = path.join(PACKAGE_ROOT, 'command_manifests/generate.md');
-const LOCAL_INTERVIEW_PATH = path.join(PACKAGE_ROOT, 'command_manifests/agentic-interviewer');
-const LOCAL_BLUEPRINT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/grill-blueprint');
+const LOCAL_GEN_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-gen');
+const LOCAL_INTERVIEW_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-interview');
+const LOCAL_BLUEPRINT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-blueprint');
 
 /**
  * Recursively copies a directory to a target destination in zero-dependency Node.js.
@@ -65,14 +65,14 @@ function installGlobally() {
 
   try {
     // 1. Verify local source files exist
-    if (!fs.existsSync(LOCAL_COMMAND_PATH)) {
-      throw new Error(`Source command manifest not found at ${LOCAL_COMMAND_PATH}.\nPlease ensure you run this script from the workspace root.`);
+    if (!fs.existsSync(LOCAL_GEN_PATH)) {
+      throw new Error(`Source sfe-gen folder not found at ${LOCAL_GEN_PATH}.\nPlease ensure you run this script from the workspace root.`);
     }
     if (!fs.existsSync(LOCAL_INTERVIEW_PATH)) {
-      throw new Error(`Source interviewer folder not found at ${LOCAL_INTERVIEW_PATH}.`);
+      throw new Error(`Source sfe-interview folder not found at ${LOCAL_INTERVIEW_PATH}.`);
     }
     if (!fs.existsSync(LOCAL_BLUEPRINT_PATH)) {
-      throw new Error(`Source blueprint folder not found at ${LOCAL_BLUEPRINT_PATH}.`);
+      throw new Error(`Source sfe-blueprint folder not found at ${LOCAL_BLUEPRINT_PATH}.`);
     }
 
     // 2. Synchronize to all potential native slash command folders (Quad-Path Sync)
@@ -89,23 +89,36 @@ function installGlobally() {
           fs.unlinkSync(legacyFlatFile);
         }
 
-        // Copy /sfe-gen manifest into generate/SKILL.md folder
-        const targetCommandDir = path.join(dir, 'generate');
-        if (!fs.existsSync(targetCommandDir)) {
-          fs.mkdirSync(targetCommandDir, { recursive: true });
+        // Clean up legacy flat/folder generate, agentic-interviewer, grill-blueprint if present
+        const oldGenPath = path.join(dir, 'generate');
+        if (fs.existsSync(oldGenPath)) {
+          fs.rmSync(oldGenPath, { recursive: true, force: true });
         }
-        const targetCommandPath = path.join(targetCommandDir, 'SKILL.md');
-        fs.copyFileSync(LOCAL_COMMAND_PATH, targetCommandPath);
+        const oldInterviewPath = path.join(dir, 'agentic-interviewer');
+        if (fs.existsSync(oldInterviewPath)) {
+          fs.rmSync(oldInterviewPath, { recursive: true, force: true });
+        }
+        const oldBlueprintPath = path.join(dir, 'grill-blueprint');
+        if (fs.existsSync(oldBlueprintPath)) {
+          fs.rmSync(oldBlueprintPath, { recursive: true, force: true });
+        }
+
+        // Copy /sfe-gen folder
+        const targetGenPath = path.join(dir, 'sfe-gen');
+        if (fs.existsSync(targetGenPath)) {
+          fs.rmSync(targetGenPath, { recursive: true, force: true });
+        }
+        copyFolderRecursiveSync(LOCAL_GEN_PATH, targetGenPath);
         
         // Copy /sfe-interview manifest folder
-        const targetInterviewPath = path.join(dir, 'agentic-interviewer');
+        const targetInterviewPath = path.join(dir, 'sfe-interview');
         if (fs.existsSync(targetInterviewPath)) {
           fs.rmSync(targetInterviewPath, { recursive: true, force: true });
         }
         copyFolderRecursiveSync(LOCAL_INTERVIEW_PATH, targetInterviewPath);
 
         // Copy /sfe-blueprint manifest folder
-        const targetBlueprintPath = path.join(dir, 'grill-blueprint');
+        const targetBlueprintPath = path.join(dir, 'sfe-blueprint');
         if (fs.existsSync(targetBlueprintPath)) {
           fs.rmSync(targetBlueprintPath, { recursive: true, force: true });
         }

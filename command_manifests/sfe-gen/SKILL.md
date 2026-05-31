@@ -1,5 +1,5 @@
 ---
-name: "generate"
+name: "sfe-gen"
 description: "Turn ideas into high-quality, security-hardened skills, hooks, agents, or coordinated multi-agent skill systems. Trigger: /sfe-gen [your idea]"
 version: "0.1.0"
 triggers:

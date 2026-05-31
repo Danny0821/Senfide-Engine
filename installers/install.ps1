@@ -49,18 +49,27 @@ try {
             Remove-Item -Path $legacyFile -Force
         }
 
-        # 3a. Install /generate command
-        $genDir = Join-Path $dir "generate"
-        if (-not (Test-Path $genDir)) {
-            New-Item -ItemType Directory -Force -Path $genDir | Out-Null
+        # Clean old legacy directories if present
+        $oldGen = Join-Path $dir "generate"
+        if (Test-Path $oldGen) { Remove-Item -Path $oldGen -Recurse -Force | Out-Null }
+        $oldInt = Join-Path $dir "agentic-interviewer"
+        if (Test-Path $oldInt) { Remove-Item -Path $oldInt -Recurse -Force | Out-Null }
+        $oldBlu = Join-Path $dir "grill-blueprint"
+        if (Test-Path $oldBlu) { Remove-Item -Path $oldBlu -Recurse -Force | Out-Null }
+
+        # 3a. Install /sfe-gen command
+        $genDir = Join-Path $dir "sfe-gen"
+        if (Test-Path $genDir) {
+            Remove-Item -Path $genDir -Recurse -Force | Out-Null
         }
+        New-Item -ItemType Directory -Force -Path $genDir | Out-Null
         $genSkillPath = Join-Path $genDir "SKILL.md"
-        $genUrl = "$githubRawBase/command_manifests/generate.md"
+        $genUrl = "$githubRawBase/command_manifests/sfe-gen/SKILL.md"
         Invoke-WebRequest -Uri $genUrl -OutFile $genSkillPath -UseBasicParsing
         Write-Host "    ✓ Registered /sfe-gen command" -ForegroundColor Green
 
-        # 3b. Install /interview (agentic-interviewer) command
-        $intDir = Join-Path $dir "agentic-interviewer"
+        # 3b. Install /sfe-interview command
+        $intDir = Join-Path $dir "sfe-interview"
         if (Test-Path $intDir) {
             Remove-Item -Path $intDir -Recurse -Force | Out-Null
         }
@@ -69,13 +78,13 @@ try {
         $filesToFetch = @("SKILL.md", "interview.json", "lessons_index.md", "playbook.md")
         foreach ($file in $filesToFetch) {
             $targetFilePath = Join-Path $intDir $file
-            $fileUrl = "$githubRawBase/command_manifests/agentic-interviewer/$file"
+            $fileUrl = "$githubRawBase/command_manifests/sfe-interview/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $targetFilePath -UseBasicParsing
         }
         Write-Host "    ✓ Registered /sfe-interview command" -ForegroundColor Green
 
-        # 3c. Install /grill-blueprint (grill-blueprint) command
-        $bluDir = Join-Path $dir "grill-blueprint"
+        # 3c. Install /sfe-blueprint command
+        $bluDir = Join-Path $dir "sfe-blueprint"
         if (Test-Path $bluDir) {
             Remove-Item -Path $bluDir -Recurse -Force | Out-Null
         }
@@ -83,7 +92,7 @@ try {
         
         foreach ($file in $filesToFetch) {
             $targetFilePath = Join-Path $bluDir $file
-            $fileUrl = "$githubRawBase/command_manifests/grill-blueprint/$file"
+            $fileUrl = "$githubRawBase/command_manifests/sfe-blueprint/$file"
             Invoke-WebRequest -Uri $fileUrl -OutFile $targetFilePath -UseBasicParsing
         }
         Write-Host "    ✓ Registered /sfe-blueprint command" -ForegroundColor Green

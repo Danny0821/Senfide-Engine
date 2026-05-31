@@ -35,22 +35,43 @@ function uninstallGlobally() {
     GLOBAL_SKILLS_DIRS.forEach(dir => {
       try {
         if (fs.existsSync(dir)) {
-          // Remove /generate folder
-          const commandDir = path.join(dir, 'generate');
+          // Remove old /generate folder
+          const oldGenDir = path.join(dir, 'generate');
+          if (fs.existsSync(oldGenDir)) {
+            fs.rmSync(oldGenDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed legacy generate from: ${dir}`);
+          }
+          
+          // Remove old /agentic-interviewer folder
+          const oldInterviewDir = path.join(dir, 'agentic-interviewer');
+          if (fs.existsSync(oldInterviewDir)) {
+            fs.rmSync(oldInterviewDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed legacy agentic-interviewer from: ${dir}`);
+          }
+
+          // Remove old /grill-blueprint folder
+          const oldBlueprintDir = path.join(dir, 'grill-blueprint');
+          if (fs.existsSync(oldBlueprintDir)) {
+            fs.rmSync(oldBlueprintDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed legacy grill-blueprint from: ${dir}`);
+          }
+
+          // Remove /sfe-gen folder
+          const commandDir = path.join(dir, 'sfe-gen');
           if (fs.existsSync(commandDir)) {
             fs.rmSync(commandDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-gen from: ${dir}`);
           }
           
-          // Remove /agentic-interviewer folder
-          const interviewDir = path.join(dir, 'agentic-interviewer');
+          // Remove /sfe-interview folder
+          const interviewDir = path.join(dir, 'sfe-interview');
           if (fs.existsSync(interviewDir)) {
             fs.rmSync(interviewDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-interview from: ${dir}`);
           }
 
-          // Remove /grill-blueprint folder
-          const blueprintDir = path.join(dir, 'grill-blueprint');
+          // Remove /sfe-blueprint folder
+          const blueprintDir = path.join(dir, 'sfe-blueprint');
           if (fs.existsSync(blueprintDir)) {
             fs.rmSync(blueprintDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-blueprint from: ${dir}`);

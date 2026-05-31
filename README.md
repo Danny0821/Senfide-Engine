@@ -63,7 +63,7 @@ When a user pastes a GitHub repository link or points an AI Agent to a folder co
 ### 2. Prompting the Agent to Scaffold new Skills
 You can directly command your active coding agent to create custom skill profiles, pre-commit hook rules, or DevTeam systems for you.
 * **Via Slash Command:** Simply type `/sfe-gen` in your chat interface. The active agent will capture the slash command manifest, execute the underlying generator globally, and guide you through the creation steps programmatically.
-* **Via Conversational Onboarding:** Type `/sfe-interview` or `/sfe-blueprint` in your chat interface. The dedicated `agentic-interviewer` or `grill-blueprint` skill will boot up, lead you through a friendly, jargon-free conversational interview about your project requirements, synthesize a team blueprint JSON, and scaffold it automatically inside your local `./skillsets/` workspace.
+* **Via Conversational Onboarding:** Type `/sfe-interview` or `/sfe-blueprint` in your chat interface. The dedicated `sfe-interview` or `sfe-blueprint` skill will boot up, lead you through a friendly, jargon-free conversational interview about your project requirements, synthesize a team blueprint JSON, and scaffold it automatically inside your local `./skillsets/` workspace.
 * **Via Prompting:** Send a clear text directive to your agent to invoke `sfe` under the hood:
   > **Prompt Directive Example:**
   > *"Create a new local-only Security Auditor skill named 'secret-scanner' using sfe. Setup advanced Python scanning requirements."*
