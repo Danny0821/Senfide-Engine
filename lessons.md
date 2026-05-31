@@ -24,6 +24,8 @@
 - Model-Agnostic UPA Purification: Remove all hardcoded model attributes (like `recommended_model` or `- Model: ...` prompt contexts) from metadata and instruction templates to ensure playbooks are fully future-proof and model-agnostic.
 - PowerShell Statement Separators: Windows PowerShell throws syntax parsing errors on double ampersands (`&&`). Command-line sequences targeting Windows hosts must strictly join statements using semicolons (`;`) or run as separate command executions.
 - Safe Self-Cleaning Defaults vs Force Fallback: Scaffolding and compilation processes must perform a safe, self-cleaning incremental merge by default, dynamically purging orphaned agents and skills. Reserve the `--force` flag strictly as a fallback option for complete clean-slate purges.
+- Language Alignment and Anti-Bloviating Tone Constraints: Instruct agent roles to dynamically detect and match the user's preferred language, and strictly forbid pleasantries, polite filler, or conversational bloviating in favor of high-density bullet points or minimal direct sentences.
+
 
 
 
