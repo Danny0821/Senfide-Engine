@@ -26,6 +26,8 @@
 - Safe Self-Cleaning Defaults vs Force Fallback: Scaffolding and compilation processes must perform a safe, self-cleaning incremental merge by default, dynamically purging orphaned agents and skills. Reserve the `--force` flag strictly as a fallback option for complete clean-slate purges.
 - Language Alignment and Anti-Bloviating Tone Constraints: Instruct agent roles to dynamically detect and match the user's preferred language, and strictly forbid pleasantries, polite filler, or conversational bloviating in favor of high-density bullet points or minimal direct sentences.
 - Interviewer Tone Manifest Purging: To completely eliminate conversational bloviating and pleasantries during onboarding, command manifests (such as sfe-interview and sfe-blueprint) must be strictly purged of soft tone descriptors (e.g., 'friendly', 'warm', 'enthusiastic') and bound to concise, direct, language-adaptive role instructions.
+- Agnostic Workspace Path Isolation: Playbook commands and target path definitions inside global onboarding skills must strictly avoid references to internal package files (like `bin/cli.js` or `scripts/generate.js`) that are not present in empty user project folders. Execute commands via the globally registered `sfe` CLI executable instead of `node bin/cli.js` to completely prevent panic search loops and out-of-bounds directory crawling.
+
 
 
 
