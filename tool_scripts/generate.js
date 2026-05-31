@@ -454,6 +454,9 @@ export function scaffoldSkill(options) {
   // Read skill template
   let tmplPath = path.join(TEMPLATE_DIR, `${resolvedArchetype}_skill_template.md`);
   if (!fs.existsSync(tmplPath)) {
+    tmplPath = path.join(TEMPLATE_DIR, `${resolvedArchetype}_template.md`);
+  }
+  if (!fs.existsSync(tmplPath)) {
     tmplPath = path.join(TEMPLATE_DIR, 'skill_template.md');
   }
   if (!fs.existsSync(tmplPath)) {

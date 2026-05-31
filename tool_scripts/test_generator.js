@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { scaffoldSkillSystem, scaffoldHook, scaffoldAgent } from './generate.js';
+import { scaffoldSkillSystem, scaffoldHook, scaffoldAgent, scaffoldSkill } from './generate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -130,6 +130,47 @@ async function runTests() {
 
     assertExists(path.join(agentDir, 'AGENT.md'));
     console.log("\n🟢 Test Case 3 passed successfully!\n");
+
+    // 4. Test Support Archetype Scaffolding
+    console.log("🧪 Test Case 4: Scaffolding Support Agents (UI-Advisor, Ephemeral Researcher, Systems Migrator)...");
+    
+    // A. UI Advisor
+    const uiDir = path.join(TEST_OUTPUT_DIR, 'ui-advisor-workspace');
+    scaffoldSkill({
+      name: 'ui-advisor',
+      description: 'Dynamic UI preview advisor',
+      tags: 'ui, css, layout',
+      targetDir: uiDir,
+      archetype: 'ui_advisor'
+    });
+    assertExists(path.join(uiDir, 'SKILL.md'));
+    assertFileContains(path.join(uiDir, 'SKILL.md'), 'Agnostic Fidelity Decision Matrix');
+
+    // B. Ephemeral Researcher
+    const resDir = path.join(TEST_OUTPUT_DIR, 'researcher-workspace');
+    scaffoldSkill({
+      name: 'tech-researcher',
+      description: 'Syntactic compaction researcher',
+      tags: 'research, compact',
+      targetDir: resDir,
+      archetype: 'researcher'
+    });
+    assertExists(path.join(resDir, 'SKILL.md'));
+    assertFileContains(path.join(resDir, 'SKILL.md'), '1,000-Token Syntactic Compaction');
+
+    // C. Systems Migrator
+    const migDir = path.join(TEST_OUTPUT_DIR, 'migrator-workspace');
+    scaffoldSkill({
+      name: 'package-migrator',
+      description: 'Isolated package dependency migrator',
+      tags: 'migrate, dependencies',
+      targetDir: migDir,
+      archetype: 'migrator'
+    });
+    assertExists(path.join(migDir, 'SKILL.md'));
+    assertFileContains(path.join(migDir, 'SKILL.md'), 'Isolated Dependency Sandbox Upgrader');
+
+    console.log("\n🟢 Test Case 4 passed successfully!\n");
 
     console.log("=====================================================");
     console.log("🎉 All programmatic scaffolding tests passed successfully!");
