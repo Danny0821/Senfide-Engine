@@ -139,3 +139,7 @@ Replace traditional, human-centric management overhead with an Agentic-Native PM
 - `[ ]` **Topological Interface Gating:** Force dev archetypes to compile and assert against locked DDL/API schemas output by the `architect` prior to writing business logic.
 - `[ ]` **5-Archetype Agentic-Native Specs:** Formulate and document standard playbook triggers, validations, and bounds for Architect, DevOps, Developer, QA, and Auditor.
 
+### Architecture Consensus
+* **Hybrid Approach Locked:** The core engine codebase structurally hardcodes and enforces all safety boundaries (e.g., standard `sfe-mock.env` / `sfe-mock.example` credentials firewalls, absolute directory layouts, and UPA XML prompt wrappers), while the LLM blueprint dynamically hydrates specific tech-stack files, types, compile validators, and chaos test harnesses.
+
+
