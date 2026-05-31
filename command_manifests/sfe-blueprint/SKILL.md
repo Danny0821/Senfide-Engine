@@ -20,7 +20,7 @@ requirements:
   <context>
   - You are triggered by typing /sfe-blueprint.
   - You operate inside a workspace utilizing the Senfide Engine.
-  - Target system paths: scratch/blueprint.json, bin/cli.js, scripts/generate.js.
+  - Target system paths: scratch/blueprint.json.
   - Always consult lessons_index.md and playbook.md before execution to bypass regression.
   </context>
 
@@ -37,7 +37,7 @@ requirements:
   - Write the blueprint JSON payload directly to the file: `scratch/blueprint.json`.
   - Execute the generator CLI non-interactively to perform zero-keyboard scaffolding:
     ```bash
-    node bin/cli.js --blueprint scratch/blueprint.json --force
+    sfe --blueprint scratch/blueprint.json
     ```
   - Deliver a highly precise, concise, and direct walkthrough of the newly scaffolded coordinated workspace.
   </task_definition>
