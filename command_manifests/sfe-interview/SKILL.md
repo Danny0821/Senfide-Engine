@@ -30,10 +30,13 @@ requirements:
     2. Question 2: What archetypes/roles do you want in your developer agent team? (PM tracker, Database Architect, DevOps pipeline, Core Developer coding, QA E2E testing, Security Auditor scanning).
     3. Question 3: What runtime environments are you comfortable with? (Node.js, Python, C#, etc.).
   - **Dynamic Density & Cohesive Grouping Rule:** Empower the LLM to design the optimal team architecture. Do NOT fall back on rigid 1-to-1 splits. Follow these grouping laws:
-    - **Language Cohesion:** If multiple required capabilities share the same runtime/programming platform (e.g., C# DB, C# UI, C# security checks), group them under a single whitelisted agent (e.g., `csharp-developer`) instead of spawning three separate agents.
-    - **Functional Boundaries:** Separate agents only across distinct operational roles (e.g., a `pm` to roadmap, an `auditor` to audit pre-commit files, and a `developer` to write and test codebase logic).
-    - **Token Conservation:** Actively minimize agent orchestration overhead by packing skills tightly inside cohesive agent profiles to conserve context tokens.
-  - Synthesize the responses into a valid blueprint.json (populating the `skills` array and grouping them into compact profiles inside the `agents` array).
+    - **Language Cohesion:** If multiple required capabilities share the same runtime/programming platform, group them under a single whitelisted agent profile to conserve context tokens.
+    - **Functional Boundaries:** Separate agents only across distinct operational roles.
+    - **Tool Group Assignment (RBAC):** For each synthesized agent in the `agents` array of `blueprint.json`, you **must** assign the correct `toolGroups` array based on the least-privilege mapping:
+      - `pm` agents: `["read_file", "write_file"]` (no command execution).
+      - `architect` / `db` agents: `["read_file", "write_file", "web"]`.
+      - `developer` / `devops` / `qa` / `auditor` (security) agents: `["read_file", "write_file", "command", "web"]`.
+  - Synthesize the responses into a valid blueprint.json (populating the `skills` array, and grouping them into compact profiles with explicit `toolGroups` inside the `agents` array).
   - Write the blueprint JSON payload directly to the file: `scratch/blueprint.json`.
   - Execute the generator CLI non-interactively to perform zero-keyboard scaffolding:
     ```bash

@@ -2,14 +2,12 @@
 name: "{{NAME}}"
 description: "{{DESCRIPTION}}"
 capabilities:
-  - "file_manipulation"
-  - "shell_execution"
+  {{CAPABILITIES_YAML}}
 default_tools:
-  - "view_file"
-  - "replace_file_content"
-  - "run_command"
+  {{TOOLS_YAML}}
 allowed_skills:
   {{ALLOWED_SKILLS_YAML}}
+
 ---
 
 # AGENT.md — {{NAME}}

@@ -1,0 +1,18 @@
+{
+  "projectName": "C:\\Users\\Daniel\\Documents\\1.Projects\\Skills-training\\output_test\\web-automated-team",
+  "coordinationRules": "DMCP Coordinated Greenfield flow",
+  "skills": [
+    {
+      "name": "web-pm",
+      "archetype": "pm",
+      "description": "Coordinated Product Backlog Management",
+      "language": "js"
+    },
+    {
+      "name": "web-db",
+      "archetype": "architect",
+      "description": "DDL SQL Topologically Sorted Schema specs",
+      "language": "default"
+    }
+  ]
+}

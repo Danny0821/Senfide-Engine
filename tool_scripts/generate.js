@@ -291,6 +291,55 @@ export function scaffoldAutolearner(targetDir, componentName, archetype = 'defau
 }
 
 /**
+ * SFE Declarative Tool Permissions Registry
+ * Maps abstract tool permissions to low-level client capabilities and tools.
+ */
+export const TOOL_GROUP_MAPPINGS = {
+  read_file: {
+    capabilities: ["file_manipulation"],
+    default_tools: ["view_file", "list_dir", "grep_search"]
+  },
+  write_file: {
+    capabilities: ["file_manipulation"],
+    default_tools: ["write_to_file", "replace_file_content", "multi_replace_file_content"]
+  },
+  command: {
+    capabilities: ["shell_execution"],
+    default_tools: ["run_command", "manage_task"]
+  },
+  web: {
+    capabilities: ["web_browsing"],
+    default_tools: ["search_web", "read_url_content"]
+  }
+};
+
+/**
+ * Translates low-level SFE tool names into client-specific names based on probed IDE/CLI channel.
+ * Ensures the generated AGENT.md is perfectly aligned with host-native capabilities.
+ * @param {Array<string>} tools - Standard SFE tool names.
+ * @param {string} editor - Probed editor identifier (e.g. 'claudecode', 'cursor', 'vscode').
+ * @returns {Array<string>} Translated client-native tool names.
+ */
+export function translateToolsForClient(tools, editor = 'generic') {
+  if (editor === 'claudecode') {
+    const translationMap = {
+      view_file: 'read',
+      list_dir: 'glob',
+      grep_search: 'grep',
+      write_to_file: 'write',
+      replace_file_content: 'write',
+      multi_replace_file_content: 'write',
+      run_command: 'bash',
+      manage_task: 'bash',
+      search_web: 'web_search',
+      read_url_content: 'web_fetch'
+    };
+    return Array.from(new Set(tools.map(t => translationMap[t] || t)));
+  }
+  return tools;
+}
+
+/**
  * 6 DevTeam Archetypes Profiles Registry
  * Each profile strictly maps to one of the 6 roles of a high-performance software organization,
  * completely eliminating cross-stack AI slop and dynamic greenfield conflicts.
@@ -599,6 +648,49 @@ if (!verifyEnvironment()) {
     fs.writeFileSync(path.join(targetDir, 'evals/evals.json'), hydratedEvals, 'utf-8');
   }
 
+  // Wave 3: Scaffolding Capability-Driven Mock Fixtures
+  if (resolvedArchetype === 'qa' || resolvedArchetype === 'developer') {
+    const mocksDir = path.join(targetDir, 'evals/mocks');
+    ensureDirectory(mocksDir);
+
+    const fetchMockContent = `/**
+ * Capability Mock: Web Browsing Fetch Mock
+ * Simulates secure local mock environments for HTTP/Web audits.
+ */
+export function mockFetch(url) {
+  console.log(\`[MOCK FETCH] intercepting request to: \${url}\`);
+  if (url.includes('cve') || url.includes('vulnerability')) {
+    return {
+      status: 200,
+      data: { cves: [] }
+    };
+  }
+  return {
+    status: 200,
+    data: { status: "OK", timestamp: new Date().toISOString() }
+  };
+}
+`;
+    const execMockContent = `/**
+ * Capability Mock: Shell Execution Mock
+ * Intercepts shell executions in verification environments.
+ */
+export function mockExecute(command) {
+  console.log(\`[MOCK EXECUTE] intercepting shell command: \${command}\`);
+  return {
+    exitCode: 0,
+    stdout: "Mock execution successful",
+    stderr: ""
+  };
+}
+`;
+
+    fs.writeFileSync(path.join(mocksDir, 'fetch_mock.js'), fetchMockContent, 'utf-8');
+    fs.writeFileSync(path.join(mocksDir, 'exec_mock.js'), execMockContent, 'utf-8');
+    console.log(`✓ Scaffolded Automated Capability Mocks: (fetch_mock.js, exec_mock.js)`);
+  }
+
+
   // Scaffold Layer 3 (CI/CD GitHub Actions Security Workflow) for Defense-in-Depth
   ensureDirectory(path.join(targetDir, '.github/workflows'));
   const workflowPath = path.join(targetDir, '.github/workflows/security_scan.yml');
@@ -732,12 +824,62 @@ echo "🟢 Safety validations complete."
  * @param {Object} options Scaffolding options.
  */
 export function scaffoldAgent(options) {
-  const { name, description, role, allowedSkills, targetDir } = options;
+  const { name, description, role, allowedSkills, targetDir, toolGroups = null } = options;
 
   ensureDirectory(targetDir);
 
   const resolvedArchetype = detectArchetype(name, description, role);
   const profile = ARCHETYPE_PROFILES[resolvedArchetype] || ARCHETYPE_PROFILES.developer;
+
+  // Resolve active toolGroups with safe default fallbacks
+  let activeToolGroups = toolGroups;
+  if (!activeToolGroups || activeToolGroups.length === 0) {
+    if (resolvedArchetype === 'pm') {
+      activeToolGroups = ["read_file", "write_file"];
+    } else {
+      activeToolGroups = ["read_file", "write_file", "command", "web"];
+    }
+  }
+
+  // Resolve unique capabilities and tools
+  const uniqueCapabilities = new Set();
+  const uniqueTools = new Set();
+
+  activeToolGroups.forEach(group => {
+    const mapping = TOOL_GROUP_MAPPINGS[group];
+    if (mapping) {
+      mapping.capabilities.forEach(c => uniqueCapabilities.add(c));
+      mapping.default_tools.forEach(t => uniqueTools.add(t));
+    }
+  });
+
+  // IDE Prober Environment Integration
+  let editor = 'generic';
+  const probePath = path.join(targetDir, '../../local-workspace/sfe-probe.json');
+  const fallbackProbePath = path.join(targetDir, '../local-workspace/sfe-probe.json');
+  let resolvedProbePath = null;
+  if (fs.existsSync(probePath)) {
+    resolvedProbePath = probePath;
+  } else if (fs.existsSync(fallbackProbePath)) {
+    resolvedProbePath = fallbackProbePath;
+  }
+
+  if (resolvedProbePath) {
+    try {
+      const probeData = JSON.parse(fs.readFileSync(resolvedProbePath, 'utf8'));
+      if (probeData && probeData.editor) {
+        editor = probeData.editor;
+      }
+    } catch (e) {
+      // Best effort read of probe cache
+    }
+  }
+
+  // Translate standard tools to client-native names
+  const finalToolsList = translateToolsForClient(Array.from(uniqueTools), editor);
+
+  const capabilitiesYaml = Array.from(uniqueCapabilities).map(c => `- "${c}"`).join('\n  ') || '- "none"';
+  const toolsYaml = finalToolsList.map(t => `- "${t}"`).join('\n  ') || '- "none"';
 
   const tmplPath = path.join(TEMPLATE_DIR, 'agent_template.md');
   if (!fs.existsSync(tmplPath)) {
@@ -752,6 +894,8 @@ export function scaffoldAgent(options) {
     NAME: name,
     DESCRIPTION: description,
     ROLE: role,
+    CAPABILITIES_YAML: capabilitiesYaml,
+    TOOLS_YAML: toolsYaml,
     ALLOWED_SKILLS_YAML: skillListYaml,
     ALLOWED_SKILLS_HUMAN: skillListHuman
   });
@@ -921,11 +1065,22 @@ export function validateBlueprint(rawBlueprint) {
         if (!Array.isArray(agent.allowedSkills)) {
           throw new Error(`Agent '${agent.name}' must have an array of 'allowedSkills'.`);
         }
+        if (agent.toolGroups) {
+          if (!Array.isArray(agent.toolGroups)) {
+            throw new Error(`Agent '${agent.name}' must have an array of 'toolGroups'.`);
+          }
+          agent.toolGroups.forEach(group => {
+            if (!TOOL_GROUP_MAPPINGS[group]) {
+              throw new Error(`Agent '${agent.name}' requests invalid tool group '${group}'. Allowed groups: ${Object.keys(TOOL_GROUP_MAPPINGS).join(', ')}`);
+            }
+          });
+        }
         return {
           name: agent.name,
           role: agent.role,
           description: agent.description,
-          allowedSkills: agent.allowedSkills.map(s => String(s).trim())
+          allowedSkills: agent.allowedSkills.map(s => String(s).trim()),
+          toolGroups: Array.isArray(agent.toolGroups) ? agent.toolGroups.map(tg => String(tg).trim()) : null
         };
       })
     : [];
@@ -977,7 +1132,8 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
         name: agent.name,
         description: agent.description,
         role: agent.role || 'Specialist',
-        allowedSkills: agent.allowedSkills.map(s => String(s).trim())
+        allowedSkills: agent.allowedSkills.map(s => String(s).trim()),
+        toolGroups: agent.toolGroups
       });
     });
   } else if (blueprint.skills.length > 1) {
@@ -1077,6 +1233,67 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
     fs.writeFileSync(playbookPath, playbookContent, 'utf-8');
   }
 
+  // Write SFE UPA planning directory structures (.planning/)
+  const planningDir = path.join(targetDir, '.planning');
+  ensureDirectory(planningDir);
+
+  const planResearchPath = path.join(planningDir, 'RESEARCH.md');
+  const planActivePath = path.join(planningDir, '01-01-PLAN.md');
+
+  const researchContent = `# Research: Unified Planning Telemetry
+
+> Factual research gathered by sfe-researcher for the target phase.
+
+## 1. Local Workspace Diagnostics
+- **Target Stack:** Javascript/Electron
+- **Dependencies:** [Autodetected packages will be listed here]
+- **File Overlaps:** None
+
+## 2. API & Dependency Specifications
+- [Verified API signatures and parameters will be written here]
+
+## 3. Environment & Security Audits
+- [Platform-specific barriers or CVE warnings will be cached here]
+`;
+
+  const planContent = `# Plan: Phase 01-01 - Greenfield Initiation
+
+## Goal
+**As a** Developer, **I want to** initialize SFE 0.7.4 workspace, **so that** we can establish coordinated multi-agent planning.
+
+## Context References
+- **Primary Source:** [SYSTEM.md](file:///{{WORKSPACE_ROOT}}/SYSTEM.md)
+- **Target Files:**
+  - \`@file [package.json](file:///{{WORKSPACE_ROOT}}/package.json)\`
+
+## Tasks (Strict 5-Task Limit)
+- \`[ ]\` **Task 1:** Bootstrapping project workspace dependencies.
+  - *Success Criteria:* package.json and .sfe-version are correctly parsed.
+- \`[ ]\` **Task 2:** Scan and index workspace skills.
+  - *Success Criteria:* CLI execute \`sfe --scan\` completes with zero warnings.
+
+## Verification Suite
+- **Manual Verification:** Confirm .planning/ directory exists and matches schema.
+- **Automated Verification Command:**
+  \`\`\`powershell
+  node -e "if (!require('fs').existsSync('.planning')) process.exit(1)"
+  \`\`\`
+
+## Rollback Protocol
+If Automated Verification fails:
+1. **Halt execution instantly.**
+2. **Roll back dirty modifications:** Run \`git checkout -- .\`
+3. **Notify pm-tracker to initiate replanning loop.**
+`;
+
+  if (!fs.existsSync(planResearchPath) || force) {
+    fs.writeFileSync(planResearchPath, researchContent, 'utf-8');
+  }
+  if (!fs.existsSync(planActivePath) || force) {
+    fs.writeFileSync(planActivePath, planContent, 'utf-8');
+  }
+
+
   // Set up directory structures and system manifest if running a multi-agent system
   if (isMultiAgent) {
     ensureDirectory(path.join(targetDir, 'skillsets'));
@@ -1144,6 +1361,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
       description: agent.description,
       role: agent.role,
       allowedSkills: agent.allowedSkills.join(', '),
+      toolGroups: agent.toolGroups,
       targetDir: agentDir
     });
   });
@@ -1158,4 +1376,89 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
   console.log("      and design system preferences. Follow their guidance to unblock developers!");
   console.log("=====================================================\n");
 }
+
+/**
+ * Compiles a relative, portable SFE Unified Plan (PLAN.md) from raw inputs.
+ * Implements Path Virtualization and the Context Density Firewall.
+ * @param {Object} planData Plan configuration details.
+ * @param {string} workspacePath Path to the local workspace root.
+ * @returns {string} Compiled, portable, and validated PLAN.md content.
+ */
+export function compilePhasePlan(planData, workspacePath) {
+  const { goal, files = [], tasks = [], verificationCommand = '' } = planData;
+
+  // 1. Context Density Estimator (Context Firewall)
+  let totalLineCount = 0;
+  const fileAudits = [];
+
+  files.forEach(filePath => {
+    const absoluteFilePath = path.resolve(workspacePath, filePath);
+    if (fs.existsSync(absoluteFilePath)) {
+      try {
+        const fileContent = fs.readFileSync(absoluteFilePath, 'utf8');
+        const lines = fileContent.split(/\r?\n/).length;
+        totalLineCount += lines;
+        fileAudits.push({ path: filePath, lines });
+      } catch (err) {
+        // Ignored if unreadable
+      }
+    }
+  });
+
+  if (totalLineCount > 2000) {
+    const auditStr = fileAudits.map(fa => `  - ${fa.path}: ${fa.lines} lines`).join('\n');
+    throw new Error(
+      `🔥 Context Density Firewall Violation: Target files exceed the 2,000-line safety threshold!\n` +
+      `Total Line Count: ${totalLineCount} lines.\n` +
+      `File breakdown:\n${auditStr}\n` +
+      `👉 Action Required: Split this phase into smaller sub-phases (e.g. Wave 01-01 and Wave 01-02).`
+    );
+  }
+
+  // 2. Path Virtualization
+  const formattedFiles = files.map(file => {
+    const cleanRelative = path.normalize(file).replace(/\\/g, '/');
+    return `- \`@file [${path.basename(file)}](file:///{{WORKSPACE_ROOT}}/${cleanRelative})\``;
+  }).join('\n');
+
+  // 3. Strict 5-Task Limit
+  if (tasks.length > 5) {
+    throw new Error(`Plan contains ${tasks.length} tasks. Strict limit is 5 tasks per phase.`);
+  }
+
+  const formattedTasks = tasks.map(task => {
+    return `- \`[ ]\` **${task.title}:** ${task.description}\n  - *Success Criteria:* ${task.criteria}`;
+  }).join('\n');
+
+  // Format verification command with Windows PowerShell separators
+  const powershellCommand = verificationCommand.replace(/\s+&&\s+/g, '; ');
+
+  return `# Plan: SFE Phase Plan
+
+## Goal
+${goal}
+
+## Context References
+- **Primary Source:** [SYSTEM.md](file:///{{WORKSPACE_ROOT}}/SYSTEM.md)
+- **Target Files:**
+${formattedFiles}
+
+## Tasks (Strict 5-Task Limit)
+${formattedTasks}
+
+## Verification Suite
+- **Manual Verification:** Confirm all success criteria are met.
+- **Automated Verification Command:**
+  \`\`\`powershell
+  ${powershellCommand}
+  \`\`\`
+
+## Rollback Protocol
+If Automated Verification fails:
+1. **Halt execution instantly.**
+2. **Roll back dirty modifications:** Run \`git checkout -- .\`
+3. **Notify pm-tracker to initiate replanning loop.**
+`;
+}
+
 
