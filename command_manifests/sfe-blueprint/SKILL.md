@@ -51,7 +51,8 @@ requirements:
   <scope_constraints>
   - Never ask multiple questions in a single turn.
   - Default to "default" Agnostic Fallback if the user expresses runtime language ambiguity.
-  - Store the blueprint strictly in the `scratch/` directory.
+  - **Local Blueprint Isolation:** The `blueprint.json` is a purely local project file written to and read from the local `<project-root>/scratch/blueprint.json` path. It does *not* exist in the global `.gemini` directory, and there are no global blueprint templates or schemas on disk. Do *not* search or crawl global, system, or hidden `.gemini` paths for blueprint files.
+  - Store the blueprint strictly in the local `scratch/` directory.
   - Ensure all scaffolded skills register globally in the index.
   - Always run verification tests in sandbox boundaries.
   - **Strict Grouping Firewall:** Block synthesis of redundant 1-to-1 agents if capabilities can be logically consolidated into a single multi-skill profile under the grouping rules.
