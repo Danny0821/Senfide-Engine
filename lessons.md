@@ -27,6 +27,8 @@
 - Language Alignment and Anti-Bloviating Tone Constraints: Instruct agent roles to dynamically detect and match the user's preferred language, and strictly forbid pleasantries, polite filler, or conversational bloviating in favor of high-density bullet points or minimal direct sentences.
 - Interviewer Tone Manifest Purging: To completely eliminate conversational bloviating and pleasantries during onboarding, command manifests (such as sfe-interview and sfe-blueprint) must be strictly purged of soft tone descriptors (e.g., 'friendly', 'warm', 'enthusiastic') and bound to concise, direct, language-adaptive role instructions.
 - Agnostic Workspace Path Isolation: Playbook commands and target path definitions inside global onboarding skills must strictly avoid references to internal package files (like `bin/cli.js` or `scripts/generate.js`) that are not present in empty user project folders. Execute commands via the globally registered `sfe` CLI executable instead of `node bin/cli.js` to completely prevent panic search loops and out-of-bounds directory crawling.
+- Local Blueprint Isolation: The `blueprint.json` configuration file is purely local to the specific project being scaffolded (written to `scratch/blueprint.json`). Playbook scope constraints must explicitly declare this local boundary and forbid the agent from crawling hidden, global, or system paths (such as the global `.gemini` directory) in search of blueprints, references, or schemas.
+
 
 
 
