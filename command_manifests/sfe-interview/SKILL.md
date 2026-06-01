@@ -60,6 +60,6 @@ requirements:
 </instructions>
 
 <review_checks>
-- Verify that blueprint.json complies with the blueprint JSON schema before writing.
+- Verify in-memory that blueprint.json contains all required structural fields (projectName, skills with archetype, and agents with allowedSkills) before writing.
 - Verify that target directories are successfully scaffolded post-CLI execution.
 </review_checks>
