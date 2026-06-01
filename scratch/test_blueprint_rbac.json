@@ -1,0 +1,47 @@
+{
+  "projectName": "C:\\Users\\Daniel\\Documents\\1.Projects\\Skills-training\\output_test\\rbac-test-app",
+  "coordinationRules": "SFE 0.7.4 Unified Planning workflow",
+  "skills": [
+    {
+      "name": "rbac-pm",
+      "archetype": "pm",
+      "description": "Orchestrates phase plans and backlog tracking",
+      "language": "js"
+    },
+    {
+      "name": "rbac-dev",
+      "archetype": "developer",
+      "description": "Writes production-grade core logic",
+      "language": "js"
+    },
+    {
+      "name": "rbac-tester",
+      "archetype": "qa",
+      "description": "Conducts test assertions and E2E validation",
+      "language": "js"
+    }
+  ],
+  "agents": [
+    {
+      "name": "pm-coordinator",
+      "role": "Product Manager",
+      "description": "Orchestrator restricted to backlog planning and task tracking.",
+      "allowedSkills": ["rbac-pm"],
+      "toolGroups": ["read_file", "write_file"]
+    },
+    {
+      "name": "dev-engineer",
+      "role": "Core Developer",
+      "description": "Developer fully empowered to write source code and execute commands.",
+      "allowedSkills": ["rbac-dev"],
+      "toolGroups": ["read_file", "write_file", "command", "web"]
+    },
+    {
+      "name": "qa-engineer",
+      "role": "QA E2E Tester",
+      "description": "Tester restricted to unit assertions and test runners.",
+      "allowedSkills": ["rbac-tester"],
+      "toolGroups": ["read_file", "write_file", "command"]
+    }
+  ]
+}
