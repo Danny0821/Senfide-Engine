@@ -206,3 +206,13 @@ High-performance, token-optimized updates designed to streamline agent execution
 *   **Quiet Telemetry Logging**: Scaffold creation CLI outputs concise, single-line telemetry summaries, reducing terminal token footprint by **>80%**.
 *   **Smart Registry Exclusions**: Recursively ignores compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`) from crawler indexes.
 *   **Optimized NPM Package**: Direct exclusion of development and E2E mock suites from packaging via explicit `"files"` configuration inside `package.json`.
+
+---
+
+## 🆕 10. Archetype Gating & Diagnostics (Release 0.7.5)
+
+*   **Defensive Diagnostics**: Verification check scripts intercept errors and output structured markdown diagnostics detailing the exception, stack trace, and troubleshooting checklists.
+*   **PM Task Backlog Dispatcher**: Product Managers (`pm`) dynamically triage goals and write task tickets under specialized archetype tags (e.g. `@skillsets/developer`, `@skillsets/qa`) in `BACKLOG.md`.
+*   **QA & Auditor Validation Gates**: Developers (`developer`) are blocked from completing tasks until both QA (`qa`) and Security Auditor (`auditor`) approvals are signed off with `true` status in `local-workspace/approval.json`.
+*   **Unified Zero-Dependency Test Harness**: Added `run_tests.js` running 13 local integration tests sequentially on `npm test` and automating provision of sandbox tests inside `sb-test-suite/`.
+
