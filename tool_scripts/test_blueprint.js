@@ -66,6 +66,39 @@ function runTests() {
         { name: "web-pm", archetype: "designer", description: "Design" } // Invalid archetype
       ]
     }), "Skill 'web-pm' has invalid archetype 'designer'");
+
+    // Duplicate skill names
+    assertThrows(() => validateBlueprint({
+      projectName: "web-portal",
+      skills: [
+        { name: "web-dev", archetype: "developer", description: "Dev 1" },
+        { name: "web-dev", archetype: "developer", description: "Dev 2" }
+      ]
+    }), "Duplicate skill name detected: 'web-dev'");
+
+    // Duplicate agent names
+    assertThrows(() => validateBlueprint({
+      projectName: "web-portal",
+      skills: [
+        { name: "web-dev", archetype: "developer", description: "Dev" }
+      ],
+      agents: [
+        { name: "expert", role: "Dev", description: "Dev 1", allowedSkills: ["web-dev"] },
+        { name: "expert", role: "Dev", description: "Dev 2", allowedSkills: ["web-dev"] }
+      ]
+    }), "Duplicate agent name detected: 'expert'");
+
+    // Undefined whitelisted skills
+    assertThrows(() => validateBlueprint({
+      projectName: "web-portal",
+      skills: [
+        { name: "web-dev", archetype: "developer", description: "Dev" }
+      ],
+      agents: [
+        { name: "expert", role: "Dev", description: "Dev 1", allowedSkills: ["web-designer"] }
+      ]
+    }), "references an undefined skill: 'web-designer'");
+
     console.log("  🟢 Test Case 3 passed successfully!\n");
 
     // 4. Default Assignments & Normalizations
@@ -147,7 +180,11 @@ function runTests() {
     assertThrows(() => compilePhasePlan(invalidPlanTasks, workspacePath), "limit is 5 tasks per phase");
 
     // Context density firewall violation
-    const tempLargeFile = path.resolve(workspacePath, 'scratch', 'temp_large_file.txt');
+    const scratchDir = path.resolve(workspacePath, 'scratch');
+    if (!fs.existsSync(scratchDir)) {
+      fs.mkdirSync(scratchDir, { recursive: true });
+    }
+    const tempLargeFile = path.resolve(scratchDir, 'temp_large_file.txt');
     const largeContent = Array(2100).fill("const x = 1;").join("\n");
     fs.writeFileSync(tempLargeFile, largeContent, 'utf-8');
 

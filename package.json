@@ -1,6 +1,6 @@
 {
   "name": "senfide-engine",
-  "version": "0.6.9",
+  "version": "0.7.5",
   "description": "Premium security-first, Caveman-styled skill generator for the Senfide Engine.",
   "main": "tool_scripts/generate.js",
   "bin": {
@@ -27,7 +27,7 @@
     "uninstall-sfe": "node tool_scripts/uninstall_global.js",
     "postinstall": "node -e \"const cp = require('child_process'); const p = cp.spawn('node', ['tool_scripts/install_global.js'], { detached: true, stdio: 'ignore' }); p.unref();\"",
     "test-autolearner": "node tool_scripts/test_autolearner.js",
-    "test": "node tool_scripts/test_generator.js && node tool_scripts/test_autolearner.js && node tool_scripts/test_indexing.js && node tool_scripts/verify_index_sandbox.js && node tool_scripts/test_blueprint.js && node tool_scripts/verify_blueprint_sandbox.js && node tool_scripts/verify_cross_env.js && node tool_scripts/test_path_resolution.js"
+    "test": "node tool_scripts/run_tests.js"
   },
   "keywords": [
     "antigravity",

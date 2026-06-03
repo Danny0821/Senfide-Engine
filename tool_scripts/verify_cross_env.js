@@ -51,11 +51,12 @@ try {
     const winBinDir = path.resolve(os.homedir(), '.gemini/config/bin');
     const cmdLauncher = path.join(winBinDir, 'sfe.cmd');
     const ps1Launcher = path.join(winBinDir, 'sfe.ps1');
+    const targetFile = path.join(winBinDir, 'sfe_cli.target');
 
-    if (!fs.existsSync(cmdLauncher) || !fs.existsSync(ps1Launcher)) {
-      throw new Error("🔴 Failed: Windows cmd/ps1 launcher files are missing!");
+    if (!fs.existsSync(cmdLauncher) || !fs.existsSync(ps1Launcher) || !fs.existsSync(targetFile)) {
+      throw new Error("🔴 Failed: Windows cmd/ps1 launcher or target tracking files are missing!");
     }
-    console.log("  ✓ Windows local launcher binary executables exist.");
+    console.log("  ✓ Windows local launcher binary executables and target tracking file exist.");
   } else {
     console.log("⚠️ Platform is not win32, skipping Windows E2E assertions.");
   }

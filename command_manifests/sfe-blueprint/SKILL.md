@@ -27,8 +27,18 @@ requirements:
   <task_definition>
   - Grill the user ONE QUESTION AT A TIME to discover their project needs:
     1. Question 1: What is the high-level description/goal of the project or tool you want to build?
-    2. Question 2: What archetypes/roles do you want in your developer agent team? (PM tracker, Database Architect, DevOps pipeline, Core Developer coding, QA E2E testing, Security Auditor scanning).
-    3. Question 3: What runtime environments are you comfortable with? (Node.js, Python, C#, etc.).
+    2. Question 2: What archetypes/roles do you want in your agent team?
+       - Software roles: PM tracker (who acts as workload/backlog dispatcher), Database Architect, DevOps pipeline, Core Developer, QA E2E testing (acting as validation gating), Security Auditor (acting as security audit gating).
+       - Abstract/Non-Coding roles: Editorial/Backlog Planner, Design/Information Architect, Writer/Content Creator, Proofreader/Editor.
+    3. Question 3: What runtime/execution environments are you comfortable with? (For coding: Node.js, Python, C#, etc. For non-coding: choose "default").
+  - **Agnostic & Abstract Project Translation Rule (Anti-Refusal):**
+    - If the user's project describes a non-coding, editorial, business, or creative task (e.g. content strategy, editorial plan, business design), DO NOT refuse or skip agent team generation.
+    - Dynamically map the user's abstract operational roles onto SFE's modular compiler archetypes:
+      - Editorial/Backlog Planner, Coordinator, Project Tracker -> `pm` archetype.
+      - System Designer, UI Designer, Wireframer, Information Architect -> `architect` archetype.
+      - Writer, Researcher, Content Developer, Script Creator -> `developer` archetype (using `default` stack).
+      - Proofreader, Style Reviewer, Editor, Compliance Auditor -> `auditor` or `qa` archetype.
+    - Guide the user to map their abstract needs onto these archetypes, explaining how they will collaborate to solve the task.
   - **Dynamic Density & Cohesive Grouping Rule:** Empower the LLM to design the optimal team architecture. Do NOT fall back on rigid 1-to-1 splits. Follow these grouping laws:
     - **Language Cohesion:** If multiple required capabilities share the same runtime/programming platform, group them under a single whitelisted agent profile to conserve context tokens.
     - **Functional Boundaries:** Separate agents only across distinct operational roles.

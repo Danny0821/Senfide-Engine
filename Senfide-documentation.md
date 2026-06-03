@@ -307,6 +307,201 @@ High-efficiency, token-saving configurations and safety structures introduced to
 ### G. Telegraphic Casing (Prompt Density)
 *   **Goal**: Strip all linguistic filler, grammar flow, and prose from templates (`skill_template.md`, `agent_template.md`, etc.).
 *   **Result**: >50% reduction in playbook context tokens on every LLM agent turn. Max prefix-caching alignment.
+  - **Code Workaround**: Multi-line script workaround blocks.
+  ```
+
+---
+
+## 🧪 5. Testing & Regressions Firewall
+
+Unified testing ensures zero regressions. Dual-verification is mandated:
+
+### Test Suites:
+* **TDD Unit Tests (`scripts/test_indexing.js`)**: Validates database load/store integrity, fuzzy searches, and YAML frontmatter parses under isolated test environments.
+* **E2E Sandbox Integration (`scripts/verify_index_sandbox.js`)**: Dynamically scaffolds mock skills, scanning and unregistering them via CLI wrapper executions, asserting correct exit statuses.
+
+```bash
+# Run full scaffolding, autolearner, unit, and E2E sandbox verification chain
+npm run test
+```
+
+---
+
+## 🛡️ 6. Core Safety Guardrails
+
+1. **Credentials Firewall**: Plain-text keys/secrets are strictly scanned and banned. All templates use env variables.
+2. **Directory Purge Shield**: The `--purge` command deletes physical directories *only* if they reside inside the global `~/.gemini/config/senfide-engine/` workspace. Local developer project workspaces are structurally protected from accidental deletions.
+3. **Robust CLI Atomic Writes**: All registry updates are written to temporary files first (`.tmp`) and then renamed, eliminating the risk of registry file corruption.
+
+---
+
+## 🆕 7. Interactive Agentic Skill Creation (Release 0.4.0 & 0.4.1)
+
+Introduces Quick vs. Advanced modes to interactively build skills with custom requirements and hardened script engines.
+
+### Creation Modes:
+1. **Quick Mode**: Zero-config scaffolding. Generates Node.js (`.js`) verification script and standard plays.
+2. **Advanced Mode**: Interactive customization of:
+   * **Triggers**: Custom slash commands or context cues.
+   * **Requirements**: Custom engine limits (e.g. `node: >=18`, `python: >=3.10`).
+   * **Tasks**: Customized step-by-step agent instructions.
+   * **Reviews**: Customized XML check criteria.
+   * **Script Language**: Choose Node.js (`.js`) or Python (`.py`).
+
+### Verification Script Stack:
+* **Node.js**: Standard modern JS verification script (`security_check.js`).
+* **Python**: Shebang-hardened (`#!/usr/bin/env python3`) verification script (`security_check.py`) with cross-platform environment fallback search path checks (`python3` -> `python` -> `py -3`) to avoid OS path crashes.
+
+### Future-Proofing & Quality Hardening (Release 0.4.1):
+1. **Dynamic Environment Baselining**:
+   * Scaffolder-time detection queries the host machine's running engine versions (`process.versions.node` and dynamic Python CLI detection) to write precise, tailored requirements (e.g. `node: >=24`).
+2. **Clean Router Descriptions**:
+   * Isolated metapoziom triggering instructions from the description field in metadata, ensuring pure semantic matching for the Router.
+3. **Active TDD Playbooks**:
+   * Playbook tasks now explicitly instruct the agent to query and target the **highest compiler/runtime standard supported by the host** (Option 1) and to actively execute unit tests (Catch2, GTest, Pytest, Jest) to verify logic instead of relying on static comments code reviews.
+4. **Dynamic Tags Hydration**:
+   * `{{TAGS}}` is dynamically resolved and written to `<context>` blocks, eliminating plain placeholders.
+
+---
+
+## 👥 8. Dual-Mode Coordination Protocol & Archetypes (Release 0.4.2)
+
+Resolves "AI slop" technology mixing and Greenfield (empty workspace) multi-agent initialization.
+
+### The 6 DevTeam Archetypes
+1. **Product Manager (`pm`)**: Roadmaps (`ROADMAP.md`), priority backlogs. Zero coding.
+2. **Designer / Architect (`architect`)**: Normal SQL schemas, API schemas, wireframes (`docs/architecture/`). Zero coding.
+3. **DevOps / Infra (`devops`)**: Optimized multi-stage Dockerfiles, compose, CI/CD actions. Zero business logic.
+4. **Developer / Creator (`developer`)**: High-modern compiler coding, unit TDD suites, environment bootstrap (`npm init`, `cargo init`).
+5. **QA / Tester (`qa`)**: E2E test suites (Playwright/Cypress), mock fixtures, coverages.
+6. **Security Auditor / Safety (`auditor`)**: Hardened Python static scripts, threat models, secrets scans.
+
+### Dual-Mode Coordination Protocol (DMCP)
+Handles team playbooks dynamically based on directory state:
+* **Orchestrated Mode**: Active parent coordinator governs execution via direct directives.
+* **Choreographed Fallback**: Decentralized self-coordination if no orchestrator exists:
+  * **Greenfield Safety**: If empty, `pm` and `architect` execute immediately to build plans. `devops`, `developer`, `qa`, and `auditor` save specs or immediately yield execution to prerequisite roles.
+  * **Transition Flow**:
+    ```mermaid
+    graph TD
+        EmptyDir[Empty Workspace] --> PM[PM: ROADMAP.md]
+        PM --> Arch[Architect: Schema & Wireframes]
+        Arch --> DevOpt[DevOps: virtualization & CI]
+        Arch --> Dev[Developer: Dotnet / Npm / Cargo bootstrap]
+        Dev --> Code[Core Business Logic & Unit tests]
+        Code --> QA[QA: E2E Playwright tests]
+        Code --> Audit[Auditor: Static OWASP scan]
+    ```
+
+---
+
+## 📂 9. Dynamic Telemetry Registries & Safe Fallback Cascade (Release 0.4.3)
+
+Resolves critical "AI Slop" context contamination in telemetry files (`lessons_index.md` & `playbook.md`) and optimizes prompt token density under the Unified Prompt Architecture (UPA).
+
+### A. Dynamic Telemetry Registry (`TELEMETRY_REGISTRY`)
+Every scaffolded skill receives stack-specific telemetry indices and playbooks, preventing cross-language leaks (e.g. Python developers trying to invoke Node's `process.env` in Python files).
+* **Developer JS (`developer:js`)**: Telemetry covering Node.js platform checks (`os.platform()`), path concatenation (`path.join`), credentials loading (`process.env`), and readline streams (`rl.close()`).
+* **Developer Python (`developer:py`)**: Telemetry covering Python's `pathlib.Path`, secure variables extraction (`os.getenv`), secure process runs (`subprocess.run`), and `pytest` module testing checks.
+* **Designer / Architect (`architect`)**: Telemetry covering DDL schemas topological ordering (creating Foreign Key dependencies last) and responsive design layout specifications.
+* **Product Manager (`pm`)**: Telemetry covering backlog milestone priorities (MoSCoW tags) and roadmap creep mitigation.
+* **DevOps (`devops`)**: Telemetry covering container EPERM volume mount blocks and multi-stage optimizations.
+* **QA (`qa`)**: Telemetry covering headless E2E browser timeout extensions and JSON mock payloads.
+* **Auditor (`auditor`)**: Telemetry covering Semgrep static scans exclusions and regex credential scanning boundaries.
+
+### B. Three-Tiered Safe Fallback Resolution Chain
+To guarantee total stability and future-proof the scaffolder for languages like C++, Go, or Rust, `scaffoldAutolearner` cascades through three resolution tiers:
+1. **Target Stack**: Look up `archetype:scriptLanguage` (e.g., `developer:cpp`).
+2. **Archetype Fallback**: Look up `archetype` (e.g., `developer`).
+3. **Global Agnostic Default**: Look up `default` (A safe, technology-agnostic playbook covering general platform paths, standard safety checks, and generic verification scripts).
+
+### C. Prompt Token Optimization
+Deleted the redundant `<autolearner>` block from the bottom of `templates/skill_template.md`. Since the playbook's `<context>` tag already instructs:
+`- Always consult lessons_index.md and playbook.md before execution to bypass regression.`
+Removing the extra 5-line XML block saves valuable context tokens on every LLM agent invocation.
+
+---
+
+## 🛡️ 10. Defense-in-Depth & Layer 3 CI/CD Workflows (Release 0.5.0)
+
+Introduces a complete **Defense-in-Depth (DiD)** multi-layered security model to protect developer environments from credential leaks, bad sandboxing, and manual git hook bypasses.
+
+### The 4-Layer Security Model:
+1. **Layer 1: Agent Sandbox Constraints**: Safety system prompts and constraints intercept and block the AI from writing/committing raw secrets.
+2. **Layer 2: Local Pre-Commit Hooks**: Client-side markdown validation hooks (`_hook.md`) trigger high-entropy regex sweeps and block local git commits upon detecting plaintext keys.
+3. **Layer 3: Automated CI/CD Pipelines**: Out-of-the-box, zero-configuration GitHub Actions workflows (`.github/workflows/security_scan.yml`) executing on pushed branches to verify security checks on remote servers, rendering local bypasses (e.g. `git commit --no-verify`) completely useless.
+4. **Layer 4: Server-Side Push Protection**: Recommends public/private repository push-protection flags to block raw secret pushes at the GitHub git-receive hook level.
+
+### Scaffolded CI/CD Pipeline Workflow Spec (.github/workflows/security_scan.yml):
+Automatically generated in newly scaffolded skill directories, customized to the active language runtime (Node.js/npm or Python/pip):
+* **Trigger scope**: Evaluates pushes and pull requests targeting master/main branches.
+* **Environment Provisioning**: Sets up node/python environment dynamically based on selected runtime during scaffolding.
+* **Scan execution**: Executes the verification pipeline (`node scripts/security_check.js` or `python scripts/security_check.py`) and runs a zero-dependency static regular expression sweep (`grep -rnE "[a-zA-Z0-9_-]{24,}"`) across workspace files.
+
+---
+
+## 🤖 11. Agentic Interviewing & Conversational Scaffolding (Release 0.7.4)
+
+Introduces conversational scaffolding utilizing the Agentic Interview Protocol (`/sfe-interview` and `/sfe-blueprint`) and non-interactive JSON blueprint declarations (`--blueprint`).
+
+### 1. Conversational Agentic Playbooks
+The interview logic is split into two separate directories under `command_manifests/` to comply with the Gemini parser, which registers only the first trigger specified in a skill folder's `SKILL.md` frontmatter:
+* **`/sfe-interview`**: Located at `command_manifests/sfe-interview/` (trigger `/sfe-interview`). It conducts an XML-guided UPA interview, asking concise business questions (scoping project goals, roles, and environments) and automatically maps replies to DevTeam archetypes.
+* **`/sfe-blueprint`**: Located at `command_manifests/sfe-blueprint/` (trigger `/sfe-blueprint`). It serves as a direct alternative shortcut to initiate the same interactive blueprint design and scaffolding workflow.
+* **Synthesis**: Synthesizes the coordinated multi-agent team blueprint JSON (incorporating declarative `toolGroups` permissions per agent) and writes it to `scratch/blueprint.json`.
+
+### 2. Multi-Skill JSON Blueprint Schema
+The declarative blueprint represents complete, integrated teams. Standard schema attributes:
+* `projectName`: Absolute or relative path to the target folder.
+* `coordinationRules`: Shared DMCP choreographed fallback rules for the team.
+* `skills`: An array of skill objects containing name, archetype, description, language, triggers, tags, custom tasks, and reviews.
+
+### 3. Non-Interactive CLI Scaffolding Pipeline
+Extended command-line capabilities to parse JSON configurations natively:
+```bash
+# Scaffold the entire coordinated multi-agent team zero-interactively
+sfe --blueprint scratch/blueprint.json
+
+# Override directory collision safeguards
+sfe --blueprint scratch/blueprint.json --force
+```
+
+### 4. Overwrite Safeguard Protocol
+* **Default behavior**: If target folders exist, the engine aborts safely with Exit Code 1.
+* **Override behavior**: Appending `--force` / `-f` forces a complete rebuild of the target directories.
+
+## ⚡ 12. Optimization, Zero-Slop, & Runtime Rules (Release 0.7.4)
+
+High-efficiency, token-saving configurations and safety structures introduced to maximize performance and prevent agent token waste.
+
+### A. Declarative Tool Permissions (Least-Privilege RBAC)
+*   **The Schema:** Incorporates the `toolGroups` array within the `agents` schema of `blueprint.json` (supported groups: `read_file`, `write_file`, `command`, `web`).
+*   **Compile Validation:** Verifies requested permissions at compile-time (`sfe --blueprint`), preventing deployment of misconfigured profiles.
+*   **IDE Native Translation:** Reads `sfe-probe.json` to translate abstract tool groups into client-native tools based on checked IDE/CLI parameters (e.g. mapping `command` -> `bash` under Claude Code vs `run_command` under Antigravity).
+
+### B. Nested UPA Phase Directories
+*   **Plan Isolation:** Compiles phase plans into structured nested paths inside `.planning/wave-{W}/plan-{P}/` (e.g., `.planning/wave-1/plan-01/PLAN.md` and `RESEARCH.md`).
+*   **Path Virtualizer:** Substitutes absolute target directory paths with `file:///{{WORKSPACE_ROOT}}/...` references.
+*   **Context Density Firewall:** Estimates file sizing prior to execution and triggers compile-time warnings if target files exceed a 2,000-line safety threshold, advising plan splitting.
+
+### C. Capability-Driven QA Mock Scaffolding
+*   **Auto-Mocks:** If the agent blueprint contains `web` permissions, SFE drops mock HTTP response runners (`fetch_mock.js`) inside `evals/mocks/`; if it uses `command`, it drops process shell mock scripts (`exec_mock.js`).
+
+### D. Folder Mapping Renaming
+*   **Old Standard**: Local scaffolding output folders default to `./output/`.
+*   **New Standard**: Default scaffolding output folders renamed to `./skillsets/` to prevent directory locks and package resolution conflicts.
+
+### E. Zero-Slop Consent Policy
+*   **Core Rule**: Playbook templates mandate agents stop and dynamically request clarification in "grey areas" (e.g. underspecified roadmap steps, database details) instead of writing placeholder AI slop.
+*   **Consent First**: No automated generation of fictitious resumes or company histories without direct user input.
+
+### F. Loop Retry Limiters
+*   **Core Rule**: Strict quarantine limit of **max 10 iterations** for all polling loops, wait cycles, or status checks inside playbooks.
+*   **Fallback**: Halt, output diagnostics, and seek directions. Prevents infinite execution loops and token drains.
+
+### G. Telegraphic Casing (Prompt Density)
+*   **Goal**: Strip all linguistic filler, grammar flow, and prose from templates (`skill_template.md`, `agent_template.md`, etc.).
+*   **Result**: >50% reduction in playbook context tokens on every LLM agent turn. Max prefix-caching alignment.
 
 ### H. Quiet Mode & Telegraphic Telemetry Logs
 *   **Telemetry logging**: CLI logs compressed into compact, single-line telemetry summaries.
@@ -315,3 +510,37 @@ High-efficiency, token-saving configurations and safety structures introduced to
 ### I. Registry Scanner Crawler Exclusions
 *   **Crawl Filters**: Excludes heavy compilation and working directories (`build`, `dist`, `skillsets`, `coverage`, `tool_tests`, `node_modules`, `.git`, `.gemini`).
 *   **Packaging Optimization**: Direct `"files"` list exclusions of development/E2E test files inside `package.json` to keep NPM distribution tarballs extremely lightweight.
+
+---
+
+## 🆕 13. Advanced Archetype Routing, Validation Gates, and Chaos Mocks (Release 0.7.5)
+
+Introduces structural exception diagnostic parsing, automated Product Manager task dispatching, QA and Security Auditor validation gates, property-based chaos mocks, and a unified zero-dependency test runner.
+
+### A. Defensive Error Diagnostic Interceptors
+Scaffolded check scripts wrap execution loops in robust try-catch blocks:
+*   **JS/Python Handlers**: Executions catching errors write structured markdown reports containing:
+    1.  **Diagnostic Header**: Bold uppercase warning header.
+    2.  **Message & Details**: Raw exception logs.
+    3.  **Stack Trace / Traceback**: Standard traceback lists.
+    4.  **Action Plan**: Actionable troubleshooting checklists for developers to debug and recover.
+
+### B. Consolidated PM Task Backlog Routing
+The Product Manager (`pm`) archetype acts as a workspace dispatcher:
+*   **Triage**: Incoming user requests are triaged to classify the required skillsets.
+*   **Archetype Tagging**: Dispatcher writes formatted task tickets into `BACKLOG.md` grouped under specialized archetype tags (e.g., `@skillsets/developer`, `@skillsets/qa`) and appends references to active research files.
+
+### C. QA & Security Auditor Validation Gating
+Introduces a hard quality and security audit firewall before task completion:
+*   **Developer Gate**: The `developer` playbook executes code but blocks sign-off until both `"qa"` and `"auditor"` keys are set to `true` inside `local-workspace/approval.json`.
+*   **QA Approval**: The `qa` playbook runs tests and, upon success, writes `"qa": true` to `local-workspace/approval.json`.
+*   **Auditor Approval**: The `auditor` playbook runs static scans and, upon success, writes `"auditor": true` to `local-workspace/approval.json`.
+
+### D. Property-Based Chaos Mocks
+Scaffolded mocks (`fetch_mock.js` and `exec_mock.js`) support property configurations to test edge cases:
+*   **Edge Cases**: Simulates mock latency, empty response triggers, malformed JSON inputs, unauthorized headers, and shell execution errors or timeout limits.
+
+### E. Expanded Zero-Dependency Test Runner
+Integrated modular testing across all boundaries on the host and sandbox:
+*   **Unified Runner**: `run_tests.js` automates global installation, sequentially runs 13 local suites (validating path normalize, CLI flags, semaphores, manifests UPA syntax, and blueprints), aggregates durations, and executes global uninstallation.
+*   **Sandbox Automation**: Configured `sb-test-suite` to verify the codebase inside clean Windows Sandbox VMs offline.

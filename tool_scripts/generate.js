@@ -352,12 +352,14 @@ export const ARCHETYPE_PROFILES = {
     tasks: [
       "Interactive Guided Onboarding & Backlog Setup:\n    1. Dynamic Onboarding: Conduct a dynamic, technology-agnostic interview with the user. Ask high-level, targeted questions based on their business domain to discover what they want to achieve.\n    2. Milestone Scaffolding: Never make assumptions in ambiguous grey areas. Once aligned on objectives, scaffold the central project roadmap and backlog definitions (`ROADMAP.md` or `BACKLOG.md`) in the repository root. Do not write application code.",
       "Track and update project milestones, feature sets, and task lists.",
-      "Coordinate deliverable tracking and project telemetry logs."
+      "Coordinate deliverable tracking and project telemetry logs.",
+      "Triage & Backlog Dispatching:\n    1. Goal Classification: When a new user request or project goal is received in chat, analyze it to determine which specialized developer/qa/auditor archetypes are needed.\n    2. Backlog Dispatching: Group and tag the tasks by archetype (e.g. '@skillsets/developer', '@skillsets/qa') in `BACKLOG.md`. Explicitly link active research files (`@local-workspace/research/...`) directly to each task to prevent context drift."
     ],
     reviews: [
       "Verify complete backlog structure alignment with user requests.",
       "Assert clear priority tags exist on all task items.",
-      "Confirm ROADMAP.md is successfully committed in repository root."
+      "Confirm ROADMAP.md is successfully committed in repository root.",
+      "Confirm PM classifies incoming requests and dispatches structured tasks inside BACKLOG.md."
     ],
     coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a Product Manager (PM). If the workspace is empty, you have priority. Execute immediately to output the roadmap, unblocking design and engineering phases.",
     scriptLanguage: 'js'
@@ -400,12 +402,14 @@ export const ARCHETYPE_PROFILES = {
     tasks: [
       "Interactive Bootstrapping & Modular Coding:\n    1. Requirement Clarification: Do not invent professional mock data or placeholder slop in grey areas. Ask the user in chat to describe what they want to achieve or to paste their real data (e.g., CV details, experience list, portfolio content). Suggest providing a draft text file as an option, but do not make it mandatory.\n    2. Modular Code Scaffolding: Once aligned on the user's data and requirements, bootstrap the project runtime immediately (e.g., 'npm init -y', 'dotnet new', 'cargo init') and begin modular coding following unit TDD.",
       "Target compiler/runtime executions at the highest modern standard flag supported by host compiler (e.g., C# 12, Python 3.12, C++20).",
-      "Verify logic correctness: Compile/run code and verify correctness against active unit test suites (e.g. Catch2, Google Test, pytest, Jest) in sandbox rather than solely reading code/comments."
+      "Verify logic correctness: Compile/run code and verify correctness against active unit test suites (e.g. Catch2, Google Test, pytest, Jest) in sandbox rather than solely reading code/comments.",
+      "Gated Task Completion:\n    1. Assert Gate Status: Read `local-workspace/approval.json` to verify that both the \"qa\" and \"auditor\" status keys are set to true.\n    2. Yield State: If `approval.json` is missing, or if either key is false/missing, do NOT mark the developer tasks as done or complete. Yield execution and request that the QA and Auditor runs be executed first."
     ],
     reviews: [
       "Before edit: Scan dependency files for outdated packages.",
       "Verify code compiles and executes flawlessly under the maximum modern language standard supported by the host.",
-      "Run test runner script and verify 100% test assertion success."
+      "Run test runner script and verify 100% test assertion success.",
+      "Verify that local-workspace/approval.json exists and holds valid true values for 'qa' and 'auditor' before signing off."
     ],
     coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a Developer. If the workspace is empty and no design blueprints or backlog milestones exist in `docs/` or `ROADMAP.md`, immediately yield execution. Instruct Designer/PM skills in the workspace to run first.",
     scriptLanguage: 'js'
@@ -416,12 +420,14 @@ export const ARCHETYPE_PROFILES = {
     requirements: ['"host-environment: >=v1"'],
     tasks: [
       "Interactive E2E & Automation Test Planning:\n    1. Critical Flows Scoping: Interview the user to map out the most critical user journeys, edge cases, and success flows they want guaranteed. Avoid generic, useless assertions.\n    2. QA Test Scaffolding: Once priorities are verified, write automated E2E and integration tests in the `tests/` directory.",
-      "Verify system performance, rate-limiting, and error-path node coverages."
+      "Verify system performance, rate-limiting, and error-path node coverages.",
+      "Run Verification & Gating:\n    1. Execute tests: Run the full test runner and verification scripts.\n    2. Compile Sign-off: Upon successful test passes, update/write `local-workspace/approval.json` setting the \"qa\" status key to true (indicating E2E and unit validations are fully passing)."
     ],
     reviews: [
       "Verify test coverage satisfies E2E user-flow paths.",
       "Confirm test mock fixtures represent clean, isolated payloads.",
-      "Run test runner script and verify 100% test assertion success."
+      "Run test runner script and verify 100% test assertion success.",
+      "Confirm local-workspace/approval.json exists and the 'qa' status key is set to true."
     ],
     coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a QA Engineer. If the workspace is empty, draft test plans in `tests/` and yield E2E execution until developer bootstrapping is complete.",
     scriptLanguage: 'js'
@@ -432,12 +438,14 @@ export const ARCHETYPE_PROFILES = {
     requirements: ['"host-environment: >=v1"'],
     tasks: [
       "Interactive Threat Scoping & Auditing:\n    1. Security Bounds Alignment: Discuss the target security threat model and compliance scope (e.g. OWASP targets, custom scan limits) with the user before scanning.\n    2. Auditor Scaffolding: Once threat model ranges are approved, write Semgrep rules, scans configuration, and audit files inside `docs/security/`.",
-      "Scan all project files for hardcoded secrets, keys, or plaintext credentials."
+      "Scan all project files for hardcoded secrets, keys, or plaintext credentials.",
+      "Run Security Gating:\n    1. Execute Security Scan: Run all static scan hooks and security script checkers.\n    2. Compile Sign-off: Upon successful security passes, update/write `local-workspace/approval.json` setting the \"auditor\" status key to true (indicating AST, secrets, and prototype pollution audits pass cleanly)."
     ],
     reviews: [
       "Verify complete absence of hardcoded keys/secrets across all repository files.",
       "Confirm OWASP-10 compliant safety gates are satisfied in threat models.",
-      "Run security scan tools and verify zero critical vulnerabilities exist."
+      "Run security scan tools and verify zero critical vulnerabilities exist.",
+      "Confirm local-workspace/approval.json exists and the 'auditor' status key is set to true."
     ],
     coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a Security Auditor. If the workspace is empty, write threat models to `docs/security/` first, and yield active code security scans until developer bootstrapping is complete.",
     scriptLanguage: 'py'
@@ -597,43 +605,65 @@ export function scaffoldSkill(options) {
     const pythonScript = `#!/usr/bin/env python3
 """
 Verification script for ${name}
-High-quality, robust validation.
+High-quality, robust validation with defensive error wrapping.
 """
 import os
 import sys
+import traceback
 
 def verify_environment():
     print("Verifying sandboxed Python execution parameters...")
     # Check for presence of credentials in env variables, ensure none are hardcoded
     if os.environ.get("UNEXPECTED_PLAIN_TEXT_KEY"):
-        print("[ERROR] Security violation: Hardcoded API keys detected in runtime environment.", file=sys.stderr)
-        return False
+        raise ValueError("Security violation: Hardcoded API keys detected in runtime environment.")
     print("[OK] Environment verified. Strict credential restrictions satisfied.")
     return True
 
 if __name__ == "__main__":
-    if not verify_environment():
+    try:
+        if not verify_environment():
+            sys.exit(1)
+        sys.exit(0)
+    except Exception as err:
+        print("\\n=====================================================", file=sys.stderr)
+        print("🔴 PYTHON EXECUTION ERROR DIAGNOSTICS", file=sys.stderr)
+        print("=====================================================", file=sys.stderr)
+        print(f"- **Message**: {str(err)}", file=sys.stderr)
+        print("- **Traceback**:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        print("- **Action Plan**: Review the error trace above. Ensure variables are declared, modules are imported, and syntax is correct.", file=sys.stderr)
+        print("=====================================================", file=sys.stderr)
         sys.exit(1)
-    sys.exit(0)
 `;
     fs.writeFileSync(path.join(targetDir, 'scripts/security_check.py'), pythonScript, 'utf-8');
   } else if (targetScriptLang === 'js') {
     const mockScript = `/**
  * Verification script for ${name}
- * High-quality, robust validation.
+ * High-quality, robust validation with defensive error wrapping.
  */
+
 export function verifyEnvironment() {
   console.log("Verifying sandboxed execution parameters...");
   // Check for presence of credentials in env variables, ensure none are hardcoded
   if (process.env.UNEXPECTED_PLAIN_TEXT_KEY) {
-    console.error("🔴 Security violation: Hardcoded API keys detected in runtime environment.");
-    return false;
+    throw new Error("Security violation: Hardcoded API keys detected in runtime environment.");
   }
   console.log("🟢 Environment verified. Strict credential restrictions satisfied.");
   return true;
 }
 
-if (!verifyEnvironment()) {
+try {
+  if (!verifyEnvironment()) {
+    process.exit(1);
+  }
+} catch (err) {
+  console.error("\\n=====================================================");
+  console.error("🔴 JAVASCRIPT EXECUTION ERROR DIAGNOSTICS");
+  console.error("=====================================================");
+  console.error(\`- **Message**: \${err.message}\`);
+  console.error(\`- **Stack Trace**:\\n\\\`\\\`\\\`\\n\${err.stack}\\n\\\`\\\`\\\`\`);
+  console.error("- **Action Plan**: Inspect the stack trace. Fix parameter types, resolve missing modules, and check for runtime undefined references.");
+  console.error("=====================================================");
   process.exit(1);
 }
 `;
@@ -656,9 +686,23 @@ if (!verifyEnvironment()) {
     const fetchMockContent = `/**
  * Capability Mock: Web Browsing Fetch Mock
  * Simulates secure local mock environments for HTTP/Web audits.
+ * Implements property-based chaos testing parameters.
  */
-export function mockFetch(url) {
-  console.log(\`[MOCK FETCH] intercepting request to: \${url}\`);
+export function mockFetch(url, options = {}) {
+  console.log(\`[MOCK FETCH] Intercepting request to: \${url}\`);
+  
+  if (options.timeout || url.includes('timeout-trigger')) {
+    throw new Error(\`ETIMEDOUT: Connection timed out fetching \${url}\`);
+  }
+  if (url.includes('empty-trigger')) {
+    return { status: 204, data: null };
+  }
+  if (url.includes('malformed-trigger')) {
+    return { status: 400, data: "Bad Request: Malformed JSON payload structure." };
+  }
+  if (url.includes('auth-trigger') && !options.headers?.Authorization) {
+    return { status: 401, data: "Unauthorized: Missing Authorization header." };
+  }
   if (url.includes('cve') || url.includes('vulnerability')) {
     return {
       status: 200,
@@ -674,9 +718,24 @@ export function mockFetch(url) {
     const execMockContent = `/**
  * Capability Mock: Shell Execution Mock
  * Intercepts shell executions in verification environments.
+ * Implements property-based chaos testing parameters.
  */
-export function mockExecute(command) {
-  console.log(\`[MOCK EXECUTE] intercepting shell command: \${command}\`);
+export function mockExecute(command, options = {}) {
+  console.log(\`[MOCK EXECUTE] Intercepting shell command: \${command}\`);
+  if (command.includes('fail-trigger')) {
+    return {
+      exitCode: 1,
+      stdout: "",
+      stderr: "Error: Command failed to execute due to permission constraints or resource exhaustion."
+    };
+  }
+  if (command.includes('timeout-trigger')) {
+    return {
+      exitCode: 124,
+      stdout: "",
+      stderr: "Error: Command execution timed out after exceeding interval limits."
+    };
+  }
   return {
     exitCode: 0,
     stdout: "Mock execution successful",
@@ -1084,6 +1143,33 @@ export function validateBlueprint(rawBlueprint) {
         };
       })
     : [];
+
+  // Assert uniqueness of skill names
+  const skillNames = new Set();
+  validatedSkills.forEach(s => {
+    if (skillNames.has(s.name)) {
+      throw new Error(`Duplicate skill name detected: '${s.name}'. Skill names must be unique.`);
+    }
+    skillNames.add(s.name);
+  });
+
+  // Assert uniqueness of agent names
+  const agentNames = new Set();
+  validatedAgents.forEach(a => {
+    if (agentNames.has(a.name)) {
+      throw new Error(`Duplicate agent name detected: '${a.name}'. Agent names must be unique.`);
+    }
+    agentNames.add(a.name);
+  });
+
+  // Assert agent whitelists only contain defined skills
+  validatedAgents.forEach(a => {
+    a.allowedSkills.forEach(skillName => {
+      if (!skillNames.has(skillName)) {
+        throw new Error(`Agent '${a.name}' references an undefined skill: '${skillName}'. Whitelisted skills must exist in the blueprint.`);
+      }
+    });
+  });
 
   return {
     projectName: rawBlueprint.projectName,

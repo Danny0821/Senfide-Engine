@@ -144,8 +144,39 @@ function installGlobally() {
       if (fs.existsSync(oldPs1)) fs.unlinkSync(oldPs1);
 
       const cliPath = path.join(PACKAGE_ROOT, 'cli_bin/cli.js');
-      const cmdLauncherContent = `@echo off\nnode "${cliPath}" %*`;
-      const ps1LauncherContent = `node "${cliPath}" $args`;
+      const targetPathFile = path.join(GLOBAL_BIN_DIR, 'sfe_cli.target');
+      fs.writeFileSync(targetPathFile, cliPath, 'utf8');
+
+      const cmdLauncherContent = `@echo off
+set "TARGET_FILE=%~dp0sfe_cli.target"
+if not exist "%TARGET_FILE%" (
+    npx --no-install sfe %*
+    exit /b
+)
+set /p CLI_PATH=<"%TARGET_FILE%"
+if exist "%CLI_PATH%" (
+    node "%CLI_PATH%" %*
+) else (
+    npx --no-install sfe %*
+)
+exit /b`;
+
+      const ps1LauncherContent = `$targetFile = Join-Path $PSScriptRoot "sfe_cli.target"
+if (Test-Path $targetFile) {
+    $cliPath = Get-Content $targetFile
+    if ($cliPath -is [array]) {
+        $cliPath = $cliPath[0]
+    }
+    if ($cliPath) {
+        $cliPath = $cliPath.Trim()
+        if (Test-Path $cliPath) {
+            node "$cliPath" $args
+            exit $LASTEXITCODE
+        }
+    }
+}
+npx --no-install sfe $args
+exit $LASTEXITCODE`;
 
       fs.writeFileSync(path.join(GLOBAL_BIN_DIR, 'sfe.cmd'), cmdLauncherContent, 'utf8');
       fs.writeFileSync(path.join(GLOBAL_BIN_DIR, 'sfe.ps1'), ps1LauncherContent, 'utf8');
