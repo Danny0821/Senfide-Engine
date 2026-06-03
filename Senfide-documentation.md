@@ -13,11 +13,15 @@ sfe is a premium, zero-dependency skill-engine, hook-rule, and multi-agent syste
 ```mermaid
 graph TD
     UserApp[Workspace Path/...] --> LocalWorkspace[Target Project Folder/]
-    LocalWorkspace --> LocalSkill[skills/my-skill/]
+    LocalWorkspace --> LocalSkill[skillsets/my-skill/]
+    LocalWorkspace --> LocalPlan[.planning/wave-1/plan-01/]
+    LocalPlan --> PLAN_MD[PLAN.md - Actionable phase tasks]
+    LocalPlan --> RESEARCH_MD[RESEARCH.md - Telemetry research facts]
     LocalSkill --> SKILL_MD[SKILL.md - Playbook]
     LocalSkill --> AL_Index[lessons_index.md - Bug Index]
-    LocalSkill --> AL_Play[playbook.md - Fix database]
+    LocalSkill --> AL_Play[playbook.md - Fix playbook]
     LocalSkill --> LocalEvals[evals/evals.json]
+    LocalEvals --> LocalMocks[evals/mocks/fetch_mock.js, exec_mock.js]
     LocalSkill --> LocalRefs[references/conventions.md]
     LocalSkill --> LocalScripts[scripts/security_check.js]
 
@@ -241,15 +245,15 @@ Automatically generated in newly scaffolded skill directories, customized to the
 
 ---
 
-## 🤖 11. Agentic Interviewing & Conversational Scaffolding (Release 0.6.9)
+## 🤖 11. Agentic Interviewing & Conversational Scaffolding (Release 0.7.4)
 
 Introduces conversational scaffolding utilizing the Agentic Interview Protocol (`/sfe-interview` and `/sfe-blueprint`) and non-interactive JSON blueprint declarations (`--blueprint`).
 
 ### 1. Conversational Agentic Playbooks
 The interview logic is split into two separate directories under `command_manifests/` to comply with the Gemini parser, which registers only the first trigger specified in a skill folder's `SKILL.md` frontmatter:
-* **`/sfe-interview`**: Located at `command_manifests/sfe-interview/` (trigger `/sfe-interview`). It conducts an XML-guided UPA interview, asking jargon-free business questions (scoping project goals, roles, and environments) and automatically maps replies to DevTeam archetypes.
+* **`/sfe-interview`**: Located at `command_manifests/sfe-interview/` (trigger `/sfe-interview`). It conducts an XML-guided UPA interview, asking concise business questions (scoping project goals, roles, and environments) and automatically maps replies to DevTeam archetypes.
 * **`/sfe-blueprint`**: Located at `command_manifests/sfe-blueprint/` (trigger `/sfe-blueprint`). It serves as a direct alternative shortcut to initiate the same interactive blueprint design and scaffolding workflow.
-* **Synthesis**: Synthesizes the coordinated multi-agent team blueprint JSON and writes it to `scratch/blueprint.json`.
+* **Synthesis**: Synthesizes the coordinated multi-agent team blueprint JSON (incorporating declarative `toolGroups` permissions per agent) and writes it to `scratch/blueprint.json`.
 
 ### 2. Multi-Skill JSON Blueprint Schema
 The declarative blueprint represents complete, integrated teams. Standard schema attributes:
@@ -271,32 +275,43 @@ sfe --blueprint scratch/blueprint.json --force
 * **Default behavior**: If target folders exist, the engine aborts safely with Exit Code 1.
 * **Override behavior**: Appending `--force` / `-f` forces a complete rebuild of the target directories.
 
----
-
-## ⚡ 12. Optimization, Zero-Slop, & Runtime Rules (Release 0.6.9)
+## ⚡ 12. Optimization, Zero-Slop, & Runtime Rules (Release 0.7.4)
 
 High-efficiency, token-saving configurations and safety structures introduced to maximize performance and prevent agent token waste.
 
-### A. Folder Mapping Renaming
-* **Old Standard**: Local scaffolding output folders default to `./output/`.
-* **New Standard**: Default scaffolding output folders renamed to `./skillsets/` to prevent directory locks and package resolution conflicts.
+### A. Declarative Tool Permissions (Least-Privilege RBAC)
+*   **The Schema:** Incorporates the `toolGroups` array within the `agents` schema of `blueprint.json` (supported groups: `read_file`, `write_file`, `command`, `web`).
+*   **Compile Validation:** Verifies requested permissions at compile-time (`sfe --blueprint`), preventing deployment of misconfigured profiles.
+*   **IDE Native Translation:** Reads `sfe-probe.json` to translate abstract tool groups into client-native tools based on checked IDE/CLI parameters (e.g. mapping `command` -> `bash` under Claude Code vs `run_command` under Antigravity).
 
-### B. Zero-Slop Consent Policy
-* **Core Rule**: Playbook templates mandate agents stop and dynamically request clarification in "grey areas" (e.g. underspecified roadmap steps, database details) instead of writing placeholder AI slop.
-* **Consent First**: No automated generation of fictitious resumes or company histories without direct user input.
+### B. Nested UPA Phase Directories
+*   **Plan Isolation:** Compiles phase plans into structured nested paths inside `.planning/wave-{W}/plan-{P}/` (e.g., `.planning/wave-1/plan-01/PLAN.md` and `RESEARCH.md`).
+*   **Path Virtualizer:** Substitutes absolute target directory paths with `file:///{{WORKSPACE_ROOT}}/...` references.
+*   **Context Density Firewall:** Estimates file sizing prior to execution and triggers compile-time warnings if target files exceed a 2,000-line safety threshold, advising plan splitting.
 
-### C. Loop Retry Limiters
-* **Core Rule**: Strict quarantine limit of **max 10 iterations** for all polling loops, wait cycles, or status checks inside playbooks.
-* **Fallback**: Halt, output diagnostics, and seek directions. Prevents infinite execution loops and token drains.
+### C. Capability-Driven QA Mock Scaffolding
+*   **Auto-Mocks:** If the agent blueprint contains `web` permissions, SFE drops mock HTTP response runners (`fetch_mock.js`) inside `evals/mocks/`; if it uses `command`, it drops process shell mock scripts (`exec_mock.js`).
 
-### D. Telegraphic Casing (Prompt Density)
-* **Goal**: Strip all linguistic filler, grammar flow, and prose from templates (`skill_template.md`, `agent_template.md`, etc.).
-* **Result**: >50% reduction in playbook context tokens on every LLM agent turn. Max prefix-caching alignment.
+### D. Folder Mapping Renaming
+*   **Old Standard**: Local scaffolding output folders default to `./output/`.
+*   **New Standard**: Default scaffolding output folders renamed to `./skillsets/` to prevent directory locks and package resolution conflicts.
 
-### E. Quiet Mode & Telegraphic Telemetry Logs
-* **Telemetry logging**: CLI logs compressed into compact, single-line telemetry summaries.
-* **Result**: >80% reduction in terminal console history consumption.
+### E. Zero-Slop Consent Policy
+*   **Core Rule**: Playbook templates mandate agents stop and dynamically request clarification in "grey areas" (e.g. underspecified roadmap steps, database details) instead of writing placeholder AI slop.
+*   **Consent First**: No automated generation of fictitious resumes or company histories without direct user input.
 
-### F. Registry Scanner Crawler Exclusions
-* **Crawl Filters**: Excludes heavy compilation and working directories (`build`, `dist`, `skillsets`, `coverage`, `tool_tests`, `node_modules`, `.git`, `.gemini`).
-* **Packaging Optimization**: Direct `"files"` list exclusions of development/E2E test files inside `package.json` to keep NPM distribution tarballs extremely lightweight.
+### F. Loop Retry Limiters
+*   **Core Rule**: Strict quarantine limit of **max 10 iterations** for all polling loops, wait cycles, or status checks inside playbooks.
+*   **Fallback**: Halt, output diagnostics, and seek directions. Prevents infinite execution loops and token drains.
+
+### G. Telegraphic Casing (Prompt Density)
+*   **Goal**: Strip all linguistic filler, grammar flow, and prose from templates (`skill_template.md`, `agent_template.md`, etc.).
+*   **Result**: >50% reduction in playbook context tokens on every LLM agent turn. Max prefix-caching alignment.
+
+### H. Quiet Mode & Telegraphic Telemetry Logs
+*   **Telemetry logging**: CLI logs compressed into compact, single-line telemetry summaries.
+*   **Result**: >80% reduction in terminal console history consumption.
+
+### I. Registry Scanner Crawler Exclusions
+*   **Crawl Filters**: Excludes heavy compilation and working directories (`build`, `dist`, `skillsets`, `coverage`, `tool_tests`, `node_modules`, `.git`, `.gemini`).
+*   **Packaging Optimization**: Direct `"files"` list exclusions of development/E2E test files inside `package.json` to keep NPM distribution tarballs extremely lightweight.

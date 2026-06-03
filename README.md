@@ -58,12 +58,12 @@ npm run test
 ### 1. Intercepting a Shared Skill Workspace
 When a user pastes a GitHub repository link or points an AI Agent to a folder containing a skill scaffolded by the `Senfide Engine`, the primary `SKILL.md` file contains UPA-aligned onboarding manifests.
 * The Agent automatically recognizes the generator directory layout.
-* It will immediately initiate a jargon-free, friendly onboarding sequence to guide you through workspace commands.
+* It will immediately initiate a concise, direct, and jargon-free onboarding sequence to guide you through workspace commands.
 
 ### 2. Prompting the Agent to Scaffold new Skills
 You can directly command your active coding agent to create custom skill profiles, pre-commit hook rules, or DevTeam systems for you.
 * **Via Slash Command:** Simply type `/sfe-gen` in your chat interface. The active agent will capture the slash command manifest, execute the underlying generator globally, and guide you through the creation steps programmatically.
-* **Via Conversational Onboarding:** Type `/sfe-interview` or `/sfe-blueprint` in your chat interface. The dedicated `sfe-interview` or `sfe-blueprint` skill will boot up, lead you through a friendly, jargon-free conversational interview about your project requirements, synthesize a team blueprint JSON, and scaffold it automatically inside your local `./skillsets/` workspace.
+* **Via Conversational Onboarding:** Type `/sfe-interview` or `/sfe-blueprint` in your chat interface. The dedicated `sfe-interview` or `sfe-blueprint` skill will boot up, lead you through a direct, concise, and jargon-free interview about your project requirements, synthesize a team blueprint JSON, and scaffold it automatically inside your local `./skillsets/` workspace.
 * **Via Prompting:** Send a clear text directive to your agent to invoke `sfe` under the hood:
   > **Prompt Directive Example:**
   > *"Create a new local-only Security Auditor skill named 'secret-scanner' using sfe. Setup advanced Python scanning requirements."*
@@ -190,14 +190,19 @@ Scaffolded skills conform strictly to the **Unified Prompt Architecture (UPA)**,
 
 ---
 
-## ⚡ 9. Performance, Zero-Slop & Optimization (Release 0.6.9)
+## ⚡ 9. Performance, Zero-Slop & Optimization (Release 0.7.4)
 
 High-performance, token-optimized updates designed to streamline agent execution and eliminate resource waste:
 
-* **Renamed Scaffold Folder**: Local scaffolding target directories now default to `./skillsets/` (was `./output/`), avoiding environment locking conflicts.
-* **Zero-Slop Consent Policy**: Generated playbook prompts strictly require agents to stop and clarify specifications in ambiguous areas instead of creating mock data/code.
-* **Loop Retry Limiters**: Quarantined loops to a hard maximum of **10 iterations** to prevent infinite token-draining runs.
-* **Telegraphic Casing**: Templates and instructions are written in dense, filler-free "Telegraphic Casing", yielding a **>50% reduction in playbook token size** and maximizing prefix-caching efficiency.
-* **Quiet Telemetry Logging**: Scaffold creation CLI outputs concise, single-line telemetry summaries, reducing terminal token footprint by **>80%**.
-* **Smart Registry Exclusions**: Recursively ignores compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`) from crawler indexes.
-* **Optimized NPM Package**: Direct exclusion of development and E2E mock suites from packaging via explicit `"files"` configuration inside `package.json`.
+*   **Declarative Tool Permissions (RBAC):** Restricts agent tools to a strictly scoped least-privilege model (`toolGroups` array within agent blueprint mappings). Abstract tool groups map directly to client-native tools based on checked IDE profiles (`sfe-probe.json`), dynamically outputting native client instructions (e.g. `bash` vs `run_command`).
+*   **Structured Planning Directories (SFE UPA):** Phase plans are compiled into a nested folder structure (`.planning/wave-{W}/plan-{P}/`) containing local `PLAN.md` and `RESEARCH.md` files. This isolates plan contexts, avoiding project root clutter and context rot.
+*   **Path Virtualization:** Translates workspace absolute paths into portable `file:///{{WORKSPACE_ROOT}}/...` placeholders dynamically expanded by the client execution runner.
+*   **Context Density Firewall:** Estimates file sizing prior to execution and triggers compile-time warnings if target files exceed a 2,000-line safety threshold, advising plan splitting.
+*   **Automated Capability Mocks:** Scaffolds process execution interceptors and web mocks inside `evals/mocks/` automatically for QA and Developer agent profiles.
+*   **Renamed Scaffold Folder**: Local scaffolding target directories now default to `./skillsets/` (was `./output/`), avoiding environment locking conflicts.
+*   **Zero-Slop Consent Policy**: Generated playbook prompts strictly require agents to stop and clarify specifications in ambiguous areas instead of creating mock data/code.
+*   **Loop Retry Limiters**: Quarantined loops to a hard maximum of **10 iterations** to prevent infinite token-draining runs.
+*   **Telegraphic Casing**: Templates and instructions are written in dense, filler-free "Telegraphic Casing", yielding a **>50% reduction in playbook token size** and maximizing prefix-caching efficiency.
+*   **Quiet Telemetry Logging**: Scaffold creation CLI outputs concise, single-line telemetry summaries, reducing terminal token footprint by **>80%**.
+*   **Smart Registry Exclusions**: Recursively ignores compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`) from crawler indexes.
+*   **Optimized NPM Package**: Direct exclusion of development and E2E mock suites from packaging via explicit `"files"` configuration inside `package.json`.

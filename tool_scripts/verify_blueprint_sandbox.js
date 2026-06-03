@@ -149,6 +149,11 @@ async function run() {
     throw new Error("Assertion failed: .gitignore is missing local-workspace/ or sfe-mock.env entries");
   }
 
+  // Assert SFE UPA planning directory structure (Release 0.7.4 nested layout)
+  assertExists(path.join(targetProjectDir, '.planning/wave-1/plan-01/PLAN.md'));
+  assertExists(path.join(targetProjectDir, '.planning/wave-1/plan-01/RESEARCH.md'));
+
+
   // A. Product Manager Skill (web-pm, Node.js runtime)
   const pmDir = path.join(targetProjectDir, 'skillsets/web-pm');
   console.log("  Asserting PM Skill folder...");

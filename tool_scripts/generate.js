@@ -1235,10 +1235,11 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 
   // Write SFE UPA planning directory structures (.planning/)
   const planningDir = path.join(targetDir, '.planning');
-  ensureDirectory(planningDir);
+  const targetPhaseDir = path.join(planningDir, 'wave-1', 'plan-01');
+  ensureDirectory(targetPhaseDir);
 
-  const planResearchPath = path.join(planningDir, 'RESEARCH.md');
-  const planActivePath = path.join(planningDir, '01-01-PLAN.md');
+  const planResearchPath = path.join(targetPhaseDir, 'RESEARCH.md');
+  const planActivePath = path.join(targetPhaseDir, 'PLAN.md');
 
   const researchContent = `# Research: Unified Planning Telemetry
 
@@ -1276,7 +1277,7 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 - **Manual Verification:** Confirm .planning/ directory exists and matches schema.
 - **Automated Verification Command:**
   \`\`\`powershell
-  node -e "if (!require('fs').existsSync('.planning')) process.exit(1)"
+  node -e "if (!require('fs').existsSync('.planning/wave-1/plan-01')) process.exit(1)"
   \`\`\`
 
 ## Rollback Protocol
@@ -1292,6 +1293,7 @@ If Automated Verification fails:
   if (!fs.existsSync(planActivePath) || force) {
     fs.writeFileSync(planActivePath, planContent, 'utf-8');
   }
+
 
 
   // Set up directory structures and system manifest if running a multi-agent system

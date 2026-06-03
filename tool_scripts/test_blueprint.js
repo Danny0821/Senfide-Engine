@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { validateBlueprint } from './generate.js';
+import { validateBlueprint, compilePhasePlan } from './generate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,6 +117,52 @@ function runTests() {
     }), "requires 'name', 'role', 'description', and 'allowedSkills'");
 
     console.log("  🟢 Test Case 5 passed successfully!\n");
+
+    // 6. UPA compilePhasePlan & Context Density Firewall
+    console.log("🧪 Test Case 6: Verifying compilePhasePlan and Context Density Firewall...");
+    const workspacePath = path.resolve(__dirname, '..');
+    const validPlan = {
+      goal: "Test goals",
+      files: ["package.json"],
+      tasks: [
+        { title: "Task 1", description: "Desc 1", criteria: "Crit 1" },
+        { title: "Task 2", description: "Desc 2", criteria: "Crit 2" }
+      ],
+      verificationCommand: "npm run test && npm run lint"
+    };
+
+    const compiled = compilePhasePlan(validPlan, workspacePath);
+    if (!compiled.includes("file:///{{WORKSPACE_ROOT}}/package.json")) {
+      throw new Error("Expected path virtualization token: {{WORKSPACE_ROOT}}");
+    }
+    if (!compiled.includes("npm run test; npm run lint")) {
+      throw new Error("Expected PowerShell command joining via semicolon");
+    }
+
+    // Too many tasks assertion
+    const invalidPlanTasks = {
+      ...validPlan,
+      tasks: Array(6).fill({ title: "Task", description: "Desc", criteria: "Crit" })
+    };
+    assertThrows(() => compilePhasePlan(invalidPlanTasks, workspacePath), "limit is 5 tasks per phase");
+
+    // Context density firewall violation
+    const tempLargeFile = path.resolve(workspacePath, 'scratch', 'temp_large_file.txt');
+    const largeContent = Array(2100).fill("const x = 1;").join("\n");
+    fs.writeFileSync(tempLargeFile, largeContent, 'utf-8');
+
+    const planWithLargeFile = {
+      ...validPlan,
+      files: ["scratch/temp_large_file.txt"]
+    };
+    assertThrows(() => compilePhasePlan(planWithLargeFile, workspacePath), "Context Density Firewall Violation");
+
+    // Cleanup
+    if (fs.existsSync(tempLargeFile)) {
+      fs.unlinkSync(tempLargeFile);
+    }
+    console.log("  🟢 Test Case 6 passed successfully!\n");
+
 
     console.log("=====================================================");
     console.log("🎉 All Blueprint Validation Unit Tests passed successfully!");
