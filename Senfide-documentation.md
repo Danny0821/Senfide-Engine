@@ -196,3 +196,15 @@ Every newly scaffolded skill receives stack-specific telemetry indices based on 
 *   **Context Density Warning**: Estimates file sizing and warns if target files exceed a 2,000-line safety threshold.
 *   **Telegraphic Casing**: Prompt templates use dense, filler-free Telegraphic Casing to yield a **>50% reduction in playbook token size** and maximize prefix-caching efficiency.
 *   **Registry Exclusions**: Crawler recursively ignores compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`, `node_modules`, `.git`, `.gemini`).
+
+---
+
+## ⚖️ 8. Active Runtime Enforcement Gates & Flow Verification
+
+To prevent sequential flow bypasses due to AI agent "helper-bias" (e.g., implementing the entire codebase in a single chat turn along with the backlog), SFE workspaces include active enforcement gates:
+
+*   **Project-Level GEMINI.md**: SFE scaffolds a static `GEMINI.md` at the project root to define role boundaries (RBAC) and sequential phases (DMCP). The Gemini/Antigravity client reads this natively on startup.
+*   **Temporal Flow Validator**: Newly scaffolded projects include `tool_scripts/verify_sfe_flow.js` linked in `package.json` under the `"test"` command and as a `.git/hooks/pre-commit` hook.
+*   **Proximity Constraint**: The validator blocks test runs and commits if `BACKLOG.md` (PM), design specs (Architect), and application code files (Developer) are modified within **15 seconds** of each other.
+*   **Git Commit Isolation Override**: If the modifications are committed in separate, sequential Git commits, the temporal proximity check is bypassed.
+*   **Escape Hatch**: To bypass flow verification for manual development, set `"bypassEnforcement": true` inside `local-workspace/state.json` or set the environment variable `SFE_BYPASS=true` during test/commit runs.

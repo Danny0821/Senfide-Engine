@@ -1454,6 +1454,74 @@ If Automated Verification fails:
     });
   });
 
+  // Write project-level instruction guidelines (GEMINI.md)
+  const geminiPath = path.join(targetDir, 'GEMINI.md');
+  const geminiTmplPath = path.join(TEMPLATE_DIR, 'gemini_template.md');
+  if (fs.existsSync(geminiTmplPath)) {
+    if (!fs.existsSync(geminiPath) || force) {
+      fs.copyFileSync(geminiTmplPath, geminiPath);
+      console.log(`✓ Scaffolded instruction guidelines [GEMINI.md]`);
+    }
+  }
+
+  // Write SFE Temporal Flow Validator script
+  const targetToolScriptsDir = path.join(targetDir, 'tool_scripts');
+  ensureDirectory(targetToolScriptsDir);
+  const flowValidatorPath = path.join(targetToolScriptsDir, 'verify_sfe_flow.js');
+  const flowValidatorTmplPath = path.join(TEMPLATE_DIR, 'verify_sfe_flow_template.js');
+  if (fs.existsSync(flowValidatorTmplPath)) {
+    if (!fs.existsSync(flowValidatorPath) || force) {
+      fs.copyFileSync(flowValidatorTmplPath, flowValidatorPath);
+      console.log(`✓ Scaffolded temporal flow validator [tool_scripts/verify_sfe_flow.js]`);
+    }
+  }
+
+  // Update package.json to integrate flow verification test
+  const packageJsonPath = path.join(targetDir, 'package.json');
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      if (!packageJson.scripts) {
+        packageJson.scripts = {};
+      }
+      packageJson.scripts['verify-flow'] = 'node tool_scripts/verify_sfe_flow.js';
+      const currentTest = packageJson.scripts.test;
+      if (!currentTest || currentTest === 'echo "Error: no test specified" && exit 1') {
+        packageJson.scripts.test = 'npm run verify-flow';
+      } else if (!currentTest.includes('verify-flow')) {
+        packageJson.scripts.test = `npm run verify-flow && ${currentTest}`;
+      }
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf-8');
+      console.log(`✓ Integrated flow verification tests inside package.json`);
+    } catch (err) {
+      console.warn(`  ⚠️ Failed to update package.json for flow verification: ${err.message}`);
+    }
+  }
+
+  // Configure Git pre-commit hook
+  const gitDir = path.join(targetDir, '.git');
+  if (fs.existsSync(gitDir)) {
+    const hooksDir = path.join(gitDir, 'hooks');
+    ensureDirectory(hooksDir);
+    const preCommitHookPath = path.join(hooksDir, 'pre-commit');
+    const hookContent = `#!/bin/sh
+# SFE Git Pre-Commit Hook
+echo "Running SFE Flow Verification..."
+node tool_scripts/verify_sfe_flow.js
+if [ $? -ne 0 ]; then
+  echo "🔴 Git commit aborted: SFE coordination flow verification failed."
+  exit 1
+fi
+`;
+    try {
+      fs.writeFileSync(preCommitHookPath, hookContent, 'utf-8');
+      fs.chmodSync(preCommitHookPath, 0o755);
+      console.log(`✓ Configured Git pre-commit hook [${preCommitHookPath}]`);
+    } catch (err) {
+      console.warn(`  ⚠️ Failed to configure Git pre-commit hook: ${err.message}`);
+    }
+  }
+
   console.log("\n=====================================================");
   console.log("🎉 Coordinated Multi-Skill Team Scaffolding Completed!");
   console.log("=====================================================");

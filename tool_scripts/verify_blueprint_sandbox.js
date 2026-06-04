@@ -153,6 +153,12 @@ async function run() {
   assertExists(path.join(targetProjectDir, '.planning/wave-1/plan-01/PLAN.md'));
   assertExists(path.join(targetProjectDir, '.planning/wave-1/plan-01/RESEARCH.md'));
 
+  // Assert SFE active runtime enforcement files (GEMINI.md and verify_sfe_flow.js)
+  assertExists(path.join(targetProjectDir, 'GEMINI.md'));
+  assertExists(path.join(targetProjectDir, 'tool_scripts/verify_sfe_flow.js'));
+  assertFileContains(path.join(targetProjectDir, 'GEMINI.md'), 'Coordinated Workspace Instructions');
+  assertFileContains(path.join(targetProjectDir, 'GEMINI.md'), 'Temporal Flow Validator');
+
 
   // A. Product Manager Skill (web-pm, Node.js runtime)
   const pmDir = path.join(targetProjectDir, 'skillsets/web-pm');
@@ -318,6 +324,10 @@ async function run() {
   assertExists(path.join(compactTargetDir, 'skillsets/python-ui/SKILL.md'));
   assertExists(path.join(compactTargetDir, 'skillsets/python-ai/SKILL.md'));
   assertExists(path.join(compactTargetDir, 'skillsets/python-db/SKILL.md'));
+  
+  // Assert SFE active runtime enforcement files in compact target
+  assertExists(path.join(compactTargetDir, 'GEMINI.md'));
+  assertExists(path.join(compactTargetDir, 'tool_scripts/verify_sfe_flow.js'));
   
   const agentMdPath = path.join(compactTargetDir, 'agents/python-expert_agent/AGENT.md');
   assertExists(agentMdPath);

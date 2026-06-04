@@ -33,7 +33,8 @@ const TEST_SUITES = [
   { name: "E2E Lifecycle Install/Uninstall", path: "tool_scripts/test_lifecycle.js" },
   { name: "Manifest Syntax Integrity Tests", path: "tool_scripts/test_manifest_integrity.js" },
   { name: "Autolearner Telemetry Integrity Tests", path: "tool_scripts/verify_autolearner_integrity.js" },
-  { name: "Project Mapping Engine Tests", path: "tool_scripts/test_project_mapper.js" }
+  { name: "Project Mapping Engine Tests", path: "tool_scripts/test_project_mapper.js" },
+  { name: "SFE Flow Validator Tests", path: "tool_scripts/test_sfe_flow_validator.js" }
 ];
 
 const INSTALLER_PATH = "tool_scripts/install_global.js";
