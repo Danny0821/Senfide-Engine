@@ -83,6 +83,13 @@ function uninstallGlobally() {
             fs.rmSync(uiDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-ui from: ${dir}`);
           }
+
+          // Remove /sfe-map-project folder
+          const mapDir = path.join(dir, 'sfe-map-project');
+          if (fs.existsSync(mapDir)) {
+            fs.rmSync(mapDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed sfe-map-project from: ${dir}`);
+          }
         }
       } catch (dirErr) {
         console.warn(`  ⚠️ Warning: Could not clean folder ${dir}: ${dirErr.message}`);

@@ -1,6 +1,6 @@
 {
   "name": "senfide-engine",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "description": "Premium security-first, Caveman-styled skill generator for the Senfide Engine.",
   "main": "tool_scripts/generate.js",
   "bin": {
@@ -14,6 +14,7 @@
     "tool_scripts/install_global.js",
     "tool_scripts/uninstall_global.js",
     "tool_scripts/path_manager.js",
+    "tool_scripts/project_mapper.js",
     "templates",
     "command_manifests",
     "package.json",

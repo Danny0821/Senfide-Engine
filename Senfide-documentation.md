@@ -80,11 +80,18 @@ Flags are categorized logically based on operational intent:
 *   `sfe --list`: Lists all cataloged skills globally across your projects.
 *   `sfe --search <term>`: Fuzzy searches the registry database index by keyword or tag.
 *   `sfe --scan <directory-path>`: Recursively crawls a directory folder to index existing skills.
+*   `sfe --map <directory-path>` (or `-m`): Programmatically scans a directory to detect programming languages, databases, testing suites, and configurations, and prints a blueprint mapping report.
 
 ### C. Maintenance & Clean-Up
 *   `sfe --remove <name>`: Unregisters a skill from the global database catalog.
 *   `sfe --remove <name> --purge`: Unregisters the skill and deletes its physical directory from disk (limited strictly to the global config folder).
 *   `sfe --install` (or `-i`): Installs SFE launchers and compiles slash commands globally.
+
+### D. Conversational Slash Commands
+*   `/sfe-map-project`: Global slash command that crawls the project, detects languages/stacks, handles non-coding/prose fallbacks, suggests optimized SFE DevTeam blueprints, and writes `scratch/blueprint.json` after two-step confirmation.
+*   `/sfe-interview`: Global slash command that dynamically interviews the user to align on team scope and custom skill rules.
+*   `/sfe-blueprint`: Global slash command that compiles and scaffolds blueprint configurations into the workspace.
+*   `/sfe-ui`: Global slash command to consult the UI/UX Advisor for premium layouts, CSS styles, HSL design theories, and Tailwind or vanilla CSS.
 
 ---
 

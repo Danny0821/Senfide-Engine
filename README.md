@@ -22,23 +22,27 @@ Install the generator globally directly from GitHub:
 npm install -g github:Danny0821/Senfide-Engine#master
 ```
 > [!NOTE]
-> This command automatically triggers a `postinstall` synchronization, linking `/sfe-gen`, `/sfe-interview`, and `/sfe-blueprint` native slash commands directly into your AI Agent chat environment configuration directories.
+> This command automatically triggers a `postinstall` synchronization, linking `/sfe-gen`, `/sfe-interview`, `/sfe-blueprint`, `/sfe-ui`, and `/sfe-map-project` native slash commands directly into your AI Agent chat environment configuration directories.
 
 ### 3-Step Quickstart Onboarding
 
 Once installed, follow these three steps to bootstrap and verify an agentic team workspace:
 
 1.  **Initialize Project & Onboard**:
-    Run the interactive onboarding interview to design your agent system:
+    Analyze your project workspace to auto-detect its stack and get a custom SFE DevTeam recommendation:
     ```bash
     # Open your agent interface and type the slash command:
+    /sfe-map-project
+    ```
+    Alternatively, run the interactive onboarding interview to design custom roles:
+    ```bash
     /sfe-interview
     ```
-    Alternatively, design a coordinated system from a template:
+    Or scaffold a system directly from a blueprint template:
     ```bash
     /sfe-blueprint
     ```
-    This guides you through a concise, jargon-free interview about your tech stack and team roles, outputting a compiled `scratch/blueprint.json` mapping your team structure.
+    This prints a report detailing the detected stack features and recommended archetypes, writing the synthesized team mapping configuration to `scratch/blueprint.json`.
 
 2.  **Scaffold the Team Skills**:
     Compile the blueprint JSON into active workspace code and playbooks:
@@ -141,6 +145,9 @@ sfe --blueprint <blueprint-json-path>
 
 # Force overwrite existing folders during blueprint scaffolding
 sfe --blueprint <blueprint-json-path> --force
+
+# Programmatically scan a directory to detect stack and suggest blueprints
+sfe --map <directory-path>
 ```
 
 ---

@@ -65,6 +65,7 @@ async function runLifecycleTests() {
       assert.ok(fs.existsSync(path.join(dir, 'sfe-gen/SKILL.md')), `Missing sfe-gen manifest in: ${dir}`);
       assert.ok(fs.existsSync(path.join(dir, 'sfe-interview/SKILL.md')), `Missing sfe-interview manifest in: ${dir}`);
       assert.ok(fs.existsSync(path.join(dir, 'sfe-blueprint/SKILL.md')), `Missing sfe-blueprint manifest in: ${dir}`);
+      assert.ok(fs.existsSync(path.join(dir, 'sfe-map-project/SKILL.md')), `Missing sfe-map-project manifest in: ${dir}`);
     });
     console.log("  ✓ Sync manifests verified across all quad-paths.");
 
@@ -94,6 +95,7 @@ async function runLifecycleTests() {
         assert.ok(!fs.existsSync(path.join(dir, 'sfe-gen')), `sfe-gen folder was not deleted in: ${dir}`);
         assert.ok(!fs.existsSync(path.join(dir, 'sfe-interview')), `sfe-interview folder was not deleted in: ${dir}`);
         assert.ok(!fs.existsSync(path.join(dir, 'sfe-blueprint')), `sfe-blueprint folder was not deleted in: ${dir}`);
+        assert.ok(!fs.existsSync(path.join(dir, 'sfe-map-project')), `sfe-map-project folder was not deleted in: ${dir}`);
       }
     });
     console.log("  ✓ Sync manifests purged cleanly across all quad-paths.");

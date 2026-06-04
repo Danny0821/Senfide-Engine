@@ -14,7 +14,9 @@
 import { fileURLToPath, pathToFileURL } from 'url';
 import path from 'path';
 import fs from 'fs';
+import readline from 'readline';
 import { loadIndex, searchSkills, scanWorkspace, unregisterSkill } from '../tool_scripts/index_manager.js';
+import { generateMapReport } from '../tool_scripts/project_mapper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,6 +108,7 @@ Options:
   -l, --list             List all globally registered skills in Senfide index
   -s, --search <term>    Fuzzy search for registered skills by name or tag
   -c, --scan <path>      Scan a directory recursively to discover and register skills
+  -m, --map <path>       Scan a directory programmatically to detect stack and suggest blueprints
   -r, --remove <name>    Unregister a skill from global index. Add --purge to delete files.
   -b, --blueprint <path> Scaffold multi-skill systems non-interactively from a JSON blueprint
   -f, --force            Overwrite existing directories during blueprint scaffolding
@@ -141,6 +144,7 @@ function parseCliArgs(args) {
     list: false,
     search: null,
     scan: null,
+    map: null,
     remove: null,
     purge: false,
     help: false,
@@ -163,6 +167,11 @@ function parseCliArgs(args) {
     } else if (arg === '--scan' || arg === '-c') {
       options.scan = args[i + 1] || '.';
       // Check if next arg is another option or empty
+      if (args[i + 1] && !args[i + 1].startsWith('-')) {
+        i++; // Skip next argument
+      }
+    } else if (arg === '--map' || arg === '-m') {
+      options.map = args[i + 1] || '.';
       if (args[i + 1] && !args[i + 1].startsWith('-')) {
         i++; // Skip next argument
       }
@@ -322,6 +331,59 @@ async function handleCommands() {
       console.error("🔴 Workspace scan failed:", err.message);
       process.exit(1);
     }
+  }
+
+  // 4.1 Map Command
+  if (options.map !== null) {
+    const mapPath = options.map;
+    const absoluteMapPath = path.resolve(mapPath);
+    if (!fs.existsSync(absoluteMapPath)) {
+      console.error(`🔴 Error: Target map folder does not exist at: ${absoluteMapPath}`);
+      process.exit(1);
+    }
+
+    console.log(`\n📁 Mapping project stack: ${absoluteMapPath}...`);
+    try {
+      const { reportText, blueprint } = generateMapReport(absoluteMapPath);
+      console.log(reportText);
+
+      const scratchDir = path.join(process.cwd(), 'scratch');
+      const blueprintFile = path.join(scratchDir, 'blueprint.json');
+
+      const writeBlueprint = () => {
+        if (!fs.existsSync(scratchDir)) {
+          fs.mkdirSync(scratchDir, { recursive: true });
+        }
+        fs.writeFileSync(blueprintFile, JSON.stringify(blueprint, null, 2), 'utf8');
+        console.log(`\n🟢 Suggested blueprint successfully written to \x1b[36mscratch/blueprint.json\x1b[0m.`);
+        console.log(`👉 Run \x1b[32msfe --blueprint scratch/blueprint.json\x1b[0m to scaffold the multi-agent workspace.`);
+      };
+
+      if (process.stdin.isTTY) {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        rl.question('\n❓ Would you like to save this blueprint to scratch/blueprint.json? (Y/n): ', (answer) => {
+          rl.close();
+          const response = answer.trim().toLowerCase();
+          if (response === '' || response === 'y' || response === 'yes') {
+            writeBlueprint();
+          } else {
+            console.log('\n❌ Map report completed. Blueprint was not saved.');
+          }
+          process.exit(0);
+        });
+      } else {
+        // Non-interactive mode
+        writeBlueprint();
+        process.exit(0);
+      }
+    } catch (err) {
+      console.error("🔴 Project mapping failed:", err.message);
+      process.exit(1);
+    }
+    return;
   }
 
   // 4.5 Remove Command

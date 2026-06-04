@@ -9,6 +9,7 @@
 
 import { execSync } from 'child_process';
 import path from 'path';
+import fs from 'fs';
 import assert from 'assert';
 import { fileURLToPath } from 'url';
 
@@ -97,6 +98,34 @@ function runCliTests() {
       assert.ok(stderr.includes("Target scan folder does not exist"), "Unexpected error message: " + stderr);
       console.log("  🟢 Test Case 7 passed successfully!");
     }
+    // 8. Test --map error case (non-existent path)
+    console.log("\n🧪 Test Case 8: Verifying --map with invalid path...");
+    try {
+      execSync(`node "${CLI_PATH}" --map "C:/invalid/map/path"`, { stdio: 'pipe' });
+      assert.fail("CLI should have exited with error code for non-existent map folder.");
+    } catch (err) {
+      assert.strictEqual(err.status, 1, "Exit code should be 1 for invalid path.");
+      const stderr = err.stderr ? err.stderr.toString() : err.stdout.toString();
+      assert.ok(stderr.includes("Target map folder does not exist"), "Unexpected error message: " + stderr);
+      console.log("  🟢 Test Case 8 passed successfully!");
+    }
+
+    // 9. Test --map execution (valid path)
+    console.log("\n🧪 Test Case 9: Verifying --map execution with valid path...");
+    const testDir = path.join(PACKAGE_ROOT, 'tool_scripts');
+    const mapOutput = execSync(`node "${CLI_PATH}" --map "${testDir}"`, { encoding: 'utf8' });
+    assert.ok(mapOutput.includes("SFE Project Mapping Analysis Report"), "Map output missing summary report.");
+    assert.ok(mapOutput.includes("Suggested SFE DevTeam Archetypes"), "Map output missing archetypes suggestion.");
+    
+    // Assert blueprint.json is written to process.cwd()/scratch/blueprint.json because it was run non-interactively
+    const expectedBlueprint = path.join(process.cwd(), 'scratch/blueprint.json');
+    assert.ok(fs.existsSync(expectedBlueprint), "Blueprint file not written in non-interactive mode.");
+    
+    // Clean up scratch/blueprint.json if created during test
+    try {
+      fs.unlinkSync(expectedBlueprint);
+    } catch (e) {}
+    console.log("  🟢 Test Case 9 passed successfully!");
 
     console.log("\n=====================================================");
     console.log("🎉 All SFE CLI Integration Tests passed successfully!");
