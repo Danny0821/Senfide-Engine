@@ -27,6 +27,7 @@
     "uninstall-sfe": "node tool_scripts/uninstall_global.js",
     "postinstall": "node -e \"const cp = require('child_process'); const p = cp.spawn('node', ['tool_scripts/install_global.js'], { detached: true, stdio: 'ignore' }); p.unref();\"",
     "test-autolearner": "node tool_scripts/test_autolearner.js",
+    "check-telemetry": "node tool_scripts/verify_autolearner_integrity.js",
     "test": "node tool_scripts/run_tests.js"
   },
   "keywords": [

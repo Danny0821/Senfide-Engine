@@ -35,7 +35,7 @@ requirements:
   - **1,000-Token Syntactic Compaction**:
     - Compile all documentation guides, cheat-sheets, and technical API references to a maximum of 1,000 dense tokens.
     - Programmatically clean up and close open markdown strings, code delimiters (e.g. triple backticks), or broken JSON arrays to ensure zero syntactic errors upon truncation.
-    - Save all research output cheatsheets strictly under `local-workspace/research/sfe-mock-research.md`.
+    - Save all research output cheatsheets under the current active planning phase folder as a markdown file named after the research scope (e.g. `.planning/wave-{W}/plan-{P}/research_{scope}.md`).
   </scope_constraints>
 </instructions>
 

@@ -9,108 +9,78 @@
 
 **Senfide Engine (`sfe`)** is a professional-grade, zero-dependency, security-first command-line engine designed to automate the scaffolding and lifecycle management of isolated **AI Agent Skills, Hook Rules, Standalone Agent Profiles, and Coordinated Agent Systems** in localized developer workspaces.
 
-Rather than writing unstructured playbooks that lead to "AI slop" or context contamination, `sfe` programmatically structures your agent environments with strict execution boundaries, stack-specific telemetry indices, and automated guardrails.
+Rather than writing unstructured playbooks that lead to "AI slop" or context contamination, `sfe` programmatically structures your agent environments with strict execution boundaries, stack-specific telemetry indices, and automated validation guardrails.
 
 ---
 
-## 🚀 1. Installation & Quick Start
+## 🚀 1. Installation & 3-Step Onboarding Tutorial
 
-Run instantly system-wide via a global installation, or clone the repository to run interactive setups locally.
+### Installation
 
-### Option A: Global Installation (Recommended)
-Install the generator globally directly from GitHub to configure both the system-wide CLI and native slash commands instantly:
+Install the generator globally directly from GitHub:
 ```bash
-# Install system-wide CLI & register all native slash commands globally
 npm install -g github:Danny0821/Senfide-Engine#master
 ```
 > [!NOTE]
-> This command automatically triggers a `postinstall` synchronization, linking `/sfe-gen`, `/sfe-interview`, and `/sfe-blueprint` native slash commands directly into your AI Agent chat environment configuration directories, delivering a zero-keyboard setup experience.
+> This command automatically triggers a `postinstall` synchronization, linking `/sfe-gen`, `/sfe-interview`, and `/sfe-blueprint` native slash commands directly into your AI Agent chat environment configuration directories.
 
-### Option B: Local Setup & Development
-If you plan to customize templates or contribute to the `Senfide Engine`, clone the repository and run interactive setups locally:
-```bash
-# 1. Clone the repository
-git clone https://github.com/Danny0821/Senfide-Engine.git
-cd Senfide-Engine
+### 3-Step Quickstart Onboarding
 
-# 2. Run setup
-npm install
+Once installed, follow these three steps to bootstrap and verify an agentic team workspace:
 
-# 3. Launch the programmatic CLI locally
-node cli_bin/cli.js --help
+1.  **Initialize Project & Onboard**:
+    Run the interactive onboarding interview to design your agent system:
+    ```bash
+    # Open your agent interface and type the slash command:
+    /sfe-interview
+    ```
+    Alternatively, design a coordinated system from a template:
+    ```bash
+    /sfe-blueprint
+    ```
+    This guides you through a concise, jargon-free interview about your tech stack and team roles, outputting a compiled `scratch/blueprint.json` mapping your team structure.
 
-# 4. (Optional) Sync slash commands globally from your local clone
-npm run install-sfe
+2.  **Scaffold the Team Skills**:
+    Compile the blueprint JSON into active workspace code and playbooks:
+    ```bash
+    sfe --blueprint scratch/blueprint.json
+    ```
+    To scaffold a single, standalone skill programmatically, you can also use `/sfe-gen` or call the command line directly:
+    ```bash
+    # Scaffold a single, standalone skill
+    /sfe-gen
+    ```
 
-# 5. (Optional) Purge global commands cleanly
-npm run uninstall-sfe
-
-# 6. Run the unit and E2E verification tests
-npm run test
-```
-
----
-
-## 🤖 2. How to Use in Agentic Mode
-
-`sfe` is natively designed to be utilized and triggered by **AI Coding Agents** (such as Gemini, or other advanced coding assistants) operating in your local development workspace.
-
-### 1. Intercepting a Shared Skill Workspace
-When a user pastes a GitHub repository link or points an AI Agent to a folder containing a skill scaffolded by the `Senfide Engine`, the primary `SKILL.md` file contains UPA-aligned onboarding manifests.
-* The Agent automatically recognizes the generator directory layout.
-* It will immediately initiate a concise, direct, and jargon-free onboarding sequence to guide you through workspace commands.
-
-### 2. Prompting the Agent to Scaffold new Skills
-You can directly command your active coding agent to create custom skill profiles, pre-commit hook rules, or DevTeam systems for you.
-* **Via Slash Command:** Simply type `/sfe-gen` in your chat interface. The active agent will capture the slash command manifest, execute the underlying generator globally, and guide you through the creation steps programmatically.
-* **Via Conversational Onboarding:** Type `/sfe-interview` or `/sfe-blueprint` in your chat interface. The dedicated `sfe-interview` or `sfe-blueprint` skill will boot up, lead you through a direct, concise, and jargon-free interview about your project requirements, synthesize a team blueprint JSON, and scaffold it automatically inside your local `./skillsets/` workspace.
-* **Via Prompting:** Send a clear text directive to your agent to invoke `sfe` under the hood:
-  > **Prompt Directive Example:**
-  > *"Create a new local-only Security Auditor skill named 'secret-scanner' using sfe. Setup advanced Python scanning requirements."*
-
-### 3. The Self-Improving Telemetry Loop (Autolearner Protocol)
-When an agent is performing software creation or infrastructure tasks under a `Senfide Engine` skill, it is bound to a closed-loop learning protocol:
-1. **Regression Prevention:** Before beginning any code write or build action, the agent's XML instructions mandate that it reads `lessons_index.md` (Telemetry Index) and `playbook.md` (Telemetry Playbook) inside the skill folder to check for historical bugs or OS workarounds.
-2. **Failure Logging:** If a sandbox run, build test, or security pre-commit validation fails, the agent writes the detailed failure context and fix criteria directly into the playbook, making it dynamically smarter for all future tasks.
+3.  **Run & Verify the Environment**:
+    Verify that your workspace executes and compiles cleanly:
+    ```bash
+    # Run the full test and verification pipeline
+    npm run test
+    ```
 
 ---
 
-## ⚙️ 3. CLI Command & Parameters Reference
+## 🛠️ 2. Core Functional Pillars
 
-`sfe` operates as an interactive guided wizard or via direct query command-line parameters:
+The engine's capabilities are built upon three core functional pillars:
 
-```bash
-# 1. List all globally cataloged skills across projects
-sfe --list
+### A. Scaffolding & Compilation
+*   Compiles declarative blueprints (`blueprint.json`) into active files, directories, playbooks, and verification script files.
+*   Auto-detects host machine runtimes (Node.js/Python) to bootstrap precise, shebang-hardened execution check scripts (`security_check.js` / `security_check.py`).
 
-# 2. Fuzzy search registry index by keyword or tag
-sfe --search <term>
+### B. Registry Discovery & Crawling
+*   Natively indexes and tracks all active skills globally across your projects in a central catalog (`senfide_index.json`).
+*   Dynamic command flags allow fuzzy searching (`--search`), registering (`--scan`), and unregistering (`--remove`) skills seamlessly.
 
-# 3. Recursively crawl a folder to discover and index existing skills
-sfe --scan <directory-path>
-
-# 4. Scaffolding with global-index bypass (bypasses registerSkill indexer)
-sfe --local-only
-
-# 5. Unregister skill from global registry database
-sfe --remove <skill-name>
-
-# 6. Unregister skill AND physically purge its folders from disk
-# (purges are restricted strictly to files inside global ~/.gemini/config/ skills path)
-sfe --remove <skill-name> --purge
-
-# 7. Declaratively scaffold a complete coordinated multi-skill team from a JSON blueprint file
-sfe --blueprint <blueprint-json-path>
-
-# 8. Force override/overwrite existing directories during blueprint scaffolding
-sfe --blueprint <blueprint-json-path> --force
-```
+### C. Multi-Agent Coordination (DMCP)
+*   Integrates the **Dual-Mode Coordination Protocol (DMCP)** inside XML playbooks.
+*   Enables agent systems to self-organize or gracefully yield execution when prerequisite design specs or database schemas are missing (greenfield safety).
 
 ---
 
-## 👥 4. The 6 DevTeam Archetypes
+## 👥 3. The 6 DevTeam Archetypes & Validation Gating
 
-To eradicate technology stack mixing ("AI slop") and Greenfield empty directory conflicts, all generated playbooks are partitioned into **6 specialized organizational profiles**:
+Playbooks are partitioned into **6 specialized organizational profiles** to prevent cross-stack context contamination:
 
 | Archetype Profile | Core Responsibility | Key Deliverables | Tech Stack Limits |
 | :--- | :--- | :--- | :--- |
@@ -118,101 +88,80 @@ To eradicate technology stack mixing ("AI slop") and Greenfield empty directory 
 | **`architect`** (Designer) | normalized schemas & UX wireframes | `docs/architecture/schema.sql`, `wireframes.md` | Zero application code. |
 | **`devops`** (Infrastructure) | virtualization, CI/CD pipeline scripts | `Dockerfile`, `docker-compose.yml`, GitHub actions | Zero business logic. |
 | **`developer`** (Creator) | Compiler standard coding, unit TDD | C#, C++, Rust, Node runtime source codes, `tests/` | Native compilation. |
-| **`qa`** (Tester) | E2E automation tests, mock fixtures | Playwright, Cypress test suites in `tests/` | Zero developer bootstrap. |
+| **`qa`** (Tester) | E2E automation tests, mock fixtures | E2E and integration tests in `tests/` | Zero developer bootstrap. |
 | **`auditor`** (Security) | Threat models, OWASP security scans | Semgrep scanners rules, threat logs | Zero wireframe designs. |
 
+### Validation Gating (Quality & Security Firewall)
+To ensure code quality and safety before signing off on developer tasks, a hard gating flow is enforced:
+1.  **Developer Gate**: The `developer` playbook executes code, but is structurally blocked from completing tasks until both the `"qa"` and `"auditor"` approval status keys are set to `true` inside `local-workspace/approval.json`.
+2.  **QA Sign-off**: The `qa` playbook runs tests and writes `"qa": true` to `approval.json` upon successful E2E validation.
+3.  **Auditor Sign-off**: The `auditor` playbook runs static checks and writes `"auditor": true` to `approval.json` upon successful security scans.
+
 ---
 
-## 🔄 5. Dual-Mode Coordination Protocol (DMCP)
+## 🤖 4. Agentic Mode & Autolearner Protocol
 
-Generated playbooks contain a dynamic, decentralized execution protocol inside their XML instructions:
+`sfe` is designed to be parsed and executed programmatically by AI coding assistants.
 
-* **Orchestrated Mode**: Active parent coordinator governs execution via direct parent-agent directives.
-* **Choreographed Fallback**: Self-organizing execution flow for multi-agent greenfield projects:
-  * **PM & Architect** assume execution priority in empty folders, bootstrapping roadmap manifests and DB schemas inside `docs/architecture/` to unblock engineers.
-  * **Developer, DevOps, QA, and Auditor** identify empty workspaces, save initial configurations, and gracefully **yield execution** to prerequisite blueprint skills, preventing code creation without specifications.
+### Unified Prompt Architecture (UPA)
+Every play matches UPA rules to maximize semantic density and prefix-caching:
+*   **XML Tags**: All instruction parameters, roles, targets, and constraints are structured within clean XML tags (e.g. `<instructions>`, `<role>`, `<scope_constraints>`).
+*   **Zero-Slop Consent Policy**: Prompts strictly forbid agents from creating fictitious placeholders or resume slop. Agents must pause and ask clarifying questions on ambiguity.
+*   **Loop Retry Limiters**: Quarantines loops to a hard maximum of **10 iterations** for polling or wait tasks to avoid runaway token charges.
 
-### Greenfield Pipeline Flow:
-```mermaid
-graph TD
-    EmptyDir[Empty Workspace] --> PM[PM: ROADMAP.md & Backlog]
-    PM --> Arch[Architect: schema.sql & wireframes.md]
-    Arch --> DevOpt[DevOps: virtualization Dockerfiles & CI configs]
-    Arch --> Dev[Developer: Environment Bootstrap npm init, cargo init]
-    Dev --> Code[Core Business Logic & Unit tests TDD]
-    Code --> QA[QA: E2E Playwright tests]
-    Code --> Audit[Auditor: Static scan exclusions & security audit]
+### The Autolearner Protocol (Self-Improving Telemetry)
+*   **Regressions Prevention**: Before any write/compile, the agent reads `lessons_index.md` (Telemetry Index) and `playbook.md` (Telemetry Playbook) in the skill folder to check historical bug records.
+*   **Dynamic Learning**: If execution fails, the agent appends details of the failure and Tested Code Workarounds to the playbook, improving system intelligence automatically.
+
+---
+
+## ⚙️ 5. CLI Command & Parameters Reference
+
+```bash
+# List all globally cataloged skills
+sfe --list
+
+# Fuzzy search registry index by keyword or tag
+sfe --search <term>
+
+# Recursively crawl and index skills in a folder
+sfe --scan <directory-path>
+
+# Scaffold with global-index registry bypass
+sfe --local-only
+
+# Unregister a skill from index
+sfe --remove <skill-name>
+
+# Unregister and purge configured files from disk (global config folder only)
+sfe --remove <skill-name> --purge
+
+# Scaffold a coordinated agent team from a JSON blueprint
+sfe --blueprint <blueprint-json-path>
+
+# Force overwrite existing folders during blueprint scaffolding
+sfe --blueprint <blueprint-json-path> --force
 ```
 
 ---
 
-## 📂 6. Dynamic Telemetry Registries & safe Fallback
+## 🛡️ 6. Core Security Guardrails
 
-Every generated skill receives an isolated telemetry index (`lessons_index.md`) and playbook (`playbook.md`) database aligned with its **Archetype** and **Language/Technology** environment:
-
-* **Developer JS (`developer:js`)**: Telemetries regarding Node platform checks (`os.platform()`), path concatenate (`path.join`), environment variables (`process.env`), and readline streams (`rl.close()`).
-* **Developer Python (`developer:py`)**: Telemetries regarding Python `pathlib.Path`, secure variables loads (`os.getenv`), secure subprocess parameters, and `pytest` module testing checks.
-* **Designer / Architect (`architect`)**: Telemetries regarding Foreign Key topologically sorted DDL SQL statements.
-* **Three-Tiered Fallback Resolution**: When scaffolding future/unsupported stacks (e.g. `C++`, `Go`, `Rust`), the engine resolves templates using a safe cascade resolver chain: `registryKey` (`archetype:lang`) $\rightarrow$ `archetype` $\rightarrow$ `default` (A safe, technology-agnostic playbook covering general platform paths, standard safety checks, and generic verification scripts), preventing system crashes.
+1.  **Credentials Firewall**: Plain-text passwords, tokens, or keys are scanned and completely banned. All templates default securely to env variables.
+2.  **Directory Purge Shield**: The `--purge` command deletes physical directories *only* if they reside inside the global user configuration path (`~/.gemini/config/`). Local developer project workspaces are structurally protected from accidental deletions.
+3.  **Atomic Registry Writes**: Central database indexes are written to temporary files first (`.tmp`) and then renamed, eliminating registry corruption.
+4.  **Cross-Platform Resilient Verification**: Scaffolded script engines (`security_check.js` / `security_check.py`) feature platform-agnostic environment fallbacks (e.g. searching Node `os.platform()` paths or executing `python3` $\rightarrow$ `python` $\rightarrow$ `py -3` fallback checks on Windows) to prevent environment execution crashes.
 
 ---
 
-## 📝 7. Unified Prompt Architecture (UPA)
-
-Scaffolded skills conform strictly to the **Unified Prompt Architecture (UPA)**, maximizing semantic density and prefix-caching efficiencies across frontier models:
-
-```xml
-<instructions>
-  <role>Specialized agent persona/casing.</role>
-  <context>Target system dependencies, DMCP lifecycle coordination tags.</context>
-  <task_definition>Lint/compilation commands, active unit test TDD parameters.</task_definition>
-  <output_format>Output delimiters and exit code standards.</output_format>
-  <scope_constraints>
-    - Sandboxed boundary constraints, credentials firewall rules.
-    - Zero-Slop Consent Policy: Stop and ask user clarification on grey areas. No slop.
-    - Loop Limit: Max 10 retries for polling loops/wait cycles.
-  </scope_constraints>
-</instructions>
-
-<review_checks>
-- Verification assertions.
-</review_checks>
-```
-
----
-
-## 🛡️ 8. Core Security Guardrails
-
-1. **Credentials Firewall**: Plain-text passwords, tokens, or keys are scanned and completely banned. All templates default securely to env variables.
-2. **Directory Purge Shield**: The `--purge` command deletes physical directories *only* if they reside inside the global user configuration path (`~/.gemini/config/`). Local developer project workspaces are structurally protected from accidental deletions.
-3. **Atomic Registry Writes**: Central database indexes are written to temporary files first (`.tmp`) and then renamed, eliminating registry corruption.
-4. **Cross-Platform Resilient Verification**: Scaffolded script engines (`security_check.js` / `security_check.py`) feature platform-agnostic environment fallbacks (e.g. searching Node `os.platform()` paths or executing `python3` $\rightarrow$ `python` $\rightarrow$ `py -3` fallback checks on Windows) to prevent environment execution crashes.
-
----
-
-## ⚡ 9. Performance, Zero-Slop & Optimization (Release 0.7.4)
-
-High-performance, token-optimized updates designed to streamline agent execution and eliminate resource waste:
+## ⚡ 7. Performance & Token Optimization
 
 *   **Declarative Tool Permissions (RBAC):** Restricts agent tools to a strictly scoped least-privilege model (`toolGroups` array within agent blueprint mappings). Abstract tool groups map directly to client-native tools based on checked IDE profiles (`sfe-probe.json`), dynamically outputting native client instructions (e.g. `bash` vs `run_command`).
 *   **Structured Planning Directories (SFE UPA):** Phase plans are compiled into a nested folder structure (`.planning/wave-{W}/plan-{P}/`) containing local `PLAN.md` and `RESEARCH.md` files. This isolates plan contexts, avoiding project root clutter and context rot.
-*   **Path Virtualization:** Translates workspace absolute paths into portable `file:///{{WORKSPACE_ROOT}}/...` placeholders dynamically expanded by the client execution runner.
-*   **Context Density Firewall:** Estimates file sizing prior to execution and triggers compile-time warnings if target files exceed a 2,000-line safety threshold, advising plan splitting.
-*   **Automated Capability Mocks:** Scaffolds process execution interceptors and web mocks inside `evals/mocks/` automatically for QA and Developer agent profiles.
-*   **Renamed Scaffold Folder**: Local scaffolding target directories now default to `./skillsets/` (was `./output/`), avoiding environment locking conflicts.
-*   **Zero-Slop Consent Policy**: Generated playbook prompts strictly require agents to stop and clarify specifications in ambiguous areas instead of creating mock data/code.
-*   **Loop Retry Limiters**: Quarantined loops to a hard maximum of **10 iterations** to prevent infinite token-draining runs.
-*   **Telegraphic Casing**: Templates and instructions are written in dense, filler-free "Telegraphic Casing", yielding a **>50% reduction in playbook token size** and maximizing prefix-caching efficiency.
-*   **Quiet Telemetry Logging**: Scaffold creation CLI outputs concise, single-line telemetry summaries, reducing terminal token footprint by **>80%**.
-*   **Smart Registry Exclusions**: Recursively ignores compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`) from crawler indexes.
+*   **Path Virtualization**: Translates workspace absolute paths into portable `file:///{{WORKSPACE_ROOT}}/...` placeholders.
+*   **Context Density Firewall**: Triggers warnings if target files exceed a 2,000-line safety threshold, advising plan splitting.
+*   **Telegraphic Casing**: Prompt templates use dense, filler-free Telegraphic Casing to yield a **>50% reduction in playbook token size** and maximize prefix-caching efficiency.
+*   **Quiet Telemetry Logging**: CLI outputs concise, single-line telemetry summaries, reducing terminal token footprint by **>80%**.
+*   **Smart Registry Exclusions**: Excludes compiled/coverage folders (`dist`, `build`, `skillsets`, `coverage`, `tool_tests`) from crawls.
 *   **Optimized NPM Package**: Direct exclusion of development and E2E mock suites from packaging via explicit `"files"` configuration inside `package.json`.
-
----
-
-## 🆕 10. Archetype Gating & Diagnostics (Release 0.7.5)
-
-*   **Defensive Diagnostics**: Verification check scripts intercept errors and output structured markdown diagnostics detailing the exception, stack trace, and troubleshooting checklists.
-*   **PM Task Backlog Dispatcher**: Product Managers (`pm`) dynamically triage goals and write task tickets under specialized archetype tags (e.g. `@skillsets/developer`, `@skillsets/qa`) in `BACKLOG.md`.
-*   **QA & Auditor Validation Gates**: Developers (`developer`) are blocked from completing tasks until both QA (`qa`) and Security Auditor (`auditor`) approvals are signed off with `true` status in `local-workspace/approval.json`.
-*   **Unified Zero-Dependency Test Harness**: Added `run_tests.js` running 13 local integration tests sequentially on `npm test` and automating provision of sandbox tests inside `sb-test-suite/`.
 

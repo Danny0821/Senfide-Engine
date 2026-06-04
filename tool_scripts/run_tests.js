@@ -31,7 +31,8 @@ const TEST_SUITES = [
   { name: "CLI Commands Integration Tests", path: "tool_scripts/test_cli.js" },
   { name: "Lock Semaphore Contention Tests", path: "tool_scripts/test_lock_semaphore.js" },
   { name: "E2E Lifecycle Install/Uninstall", path: "tool_scripts/test_lifecycle.js" },
-  { name: "Manifest Syntax Integrity Tests", path: "tool_scripts/test_manifest_integrity.js" }
+  { name: "Manifest Syntax Integrity Tests", path: "tool_scripts/test_manifest_integrity.js" },
+  { name: "Autolearner Telemetry Integrity Tests", path: "tool_scripts/verify_autolearner_integrity.js" }
 ];
 
 const INSTALLER_PATH = "tool_scripts/install_global.js";

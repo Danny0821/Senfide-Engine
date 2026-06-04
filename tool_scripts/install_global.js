@@ -34,6 +34,7 @@ const GLOBAL_BIN_DIR = path.resolve(os.homedir(), '.gemini/config/bin');
 const LOCAL_GEN_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-gen');
 const LOCAL_INTERVIEW_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-interview');
 const LOCAL_BLUEPRINT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-blueprint');
+const LOCAL_UI_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-ui');
 
 /**
  * Recursively copies a directory to a target destination in zero-dependency Node.js.
@@ -73,6 +74,9 @@ function installGlobally() {
     }
     if (!fs.existsSync(LOCAL_BLUEPRINT_PATH)) {
       throw new Error(`Source sfe-blueprint folder not found at ${LOCAL_BLUEPRINT_PATH}.`);
+    }
+    if (!fs.existsSync(LOCAL_UI_PATH)) {
+      throw new Error(`Source sfe-ui folder not found at ${LOCAL_UI_PATH}.`);
     }
 
     // 2. Synchronize to all potential native slash command folders (Quad-Path Sync)
@@ -123,6 +127,13 @@ function installGlobally() {
           fs.rmSync(targetBlueprintPath, { recursive: true, force: true });
         }
         copyFolderRecursiveSync(LOCAL_BLUEPRINT_PATH, targetBlueprintPath);
+
+        // Copy /sfe-ui manifest folder
+        const targetUiPath = path.join(dir, 'sfe-ui');
+        if (fs.existsSync(targetUiPath)) {
+          fs.rmSync(targetUiPath, { recursive: true, force: true });
+        }
+        copyFolderRecursiveSync(LOCAL_UI_PATH, targetUiPath);
 
         console.log(`  🟢 Synced to: ${dir}`);
       } catch (dirErr) {
@@ -192,7 +203,7 @@ exit $LASTEXITCODE`;
 
     console.log(`\n🟢 Success! System-wide registration complete.`);
     console.log("\n✨ The native slash commands are now active globally!");
-    console.log("👉 You can now type `/sfe-gen`, `/sfe-interview`, or `/sfe-blueprint` inside your Windows agy client.");
+    console.log("👉 You can now type `/sfe-gen`, `/sfe-interview`, `/sfe-blueprint`, or `/sfe-ui` inside your Windows agy client.");
     console.log("=========================================================");
   } catch (err) {
     console.error(`\n🔴 Installation failed: ${err.message}`);

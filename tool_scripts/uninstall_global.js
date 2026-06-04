@@ -76,6 +76,13 @@ function uninstallGlobally() {
             fs.rmSync(blueprintDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-blueprint from: ${dir}`);
           }
+
+          // Remove /sfe-ui folder
+          const uiDir = path.join(dir, 'sfe-ui');
+          if (fs.existsSync(uiDir)) {
+            fs.rmSync(uiDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed sfe-ui from: ${dir}`);
+          }
         }
       } catch (dirErr) {
         console.warn(`  ⚠️ Warning: Could not clean folder ${dir}: ${dirErr.message}`);

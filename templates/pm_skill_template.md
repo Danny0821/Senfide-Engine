@@ -41,6 +41,10 @@ requirements:
     2. If `supportsRichLinks` is `true`, format all target file references using Cursor/VS Code rich links with the `@` symbol (e.g. `@docs/ROADMAP.md` or `@src/types/types.ts`).
     3. If `supportsRichLinks` is `false`, format all target file references using literal POSIX-standard forward-slash paths (e.g. `[ROADMAP.md](file:///absolute/path/to/docs/ROADMAP.md)` or standard markdown links).
     4. Force all links/paths to POSIX-standard forward slashes (`/`), even on Windows host environments.
+  - **Parallel Subagent Spawning & Research Integration**:
+    1. Coordinate up to **3 parallel subagents** (including multiple instances of the same archetype, e.g. 3x `developer`, 3x `researcher`, 3x `qa`, or support agents like `ui_advisor` / `migrator`) when tasks are independent, decoupled, and partitioned.
+    2. Consolidate and summarize individual research deliverables (written as `research_{scope}.md` by the researcher subagents) into the main `RESEARCH.md` file under `.planning/wave-{W}/plan-{P}/RESEARCH.md`.
+    3. Invoke the `ui_advisor` support agent at any time during the planning or execution phases to synthesize UI concepts and write interactive wireframe pre-views directly to `local-workspace/sfe-mock-preview.html` for rapid user review.
   </scope_constraints>
 </instructions>
 

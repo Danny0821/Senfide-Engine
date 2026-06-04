@@ -276,11 +276,11 @@ function runSandboxVerification() {
     });
 
     // F. Scaffold QA Skill
-    const qaSkillDir = path.join(SOURCE_SANDBOX_DIR, 'playwright-e2e-suite');
+    const qaSkillDir = path.join(SOURCE_SANDBOX_DIR, 'qa-integration-suite');
     scaffoldSkill({
-      name: 'playwright-e2e-suite',
-      description: 'Playwright test suite.',
-      tags: 'qa, test, playwright',
+      name: 'qa-integration-suite',
+      description: 'QA integration test suite.',
+      tags: 'qa, test, integration',
       targetDir: qaSkillDir,
       creationMode: 'advanced',
       archetype: 'qa',
@@ -394,7 +394,7 @@ function runSandboxVerification() {
     }
     console.log("  ✓ DevOps skill structurally validated (Zero-Slop, Pure DevOps Telemetry).");
 
-    // 6. Assert playwright-e2e-suite (QA Archetype) contains correct QA telemetry
+    // 6. Assert qa-integration-suite (QA Archetype) contains correct QA telemetry
     const qaPlaybook = fs.readFileSync(path.join(qaSkillDir, 'playbook.md'), 'utf8');
     if (!qaPlaybook.includes('[TEST_TIMEOUT_01]') || !qaPlaybook.includes('waitForSelector')) {
       throw new Error("QA playbook is missing test timeout telemetry!");
