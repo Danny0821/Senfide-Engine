@@ -32,7 +32,7 @@ requirements:
   - **Recommend coordinated Skill System**.
   - Group into parent folder. Manifest in `SYSTEM.md`.
 - **If scope is event-driven task automation** (e.g. check on save, scan keys before commit):
-  - **Suggest Agent Hook** (place in `.agent/rules/`).
+  - **Suggest Agent Hook** (place in `.agents/rules/`).
 - **If scope is custom persona or dedicated interface**:
   - **Suggest Agent Profile** (`AGENT.md`).
 - **Otherwise**:

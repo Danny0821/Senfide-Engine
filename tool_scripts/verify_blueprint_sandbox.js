@@ -159,6 +159,10 @@ async function run() {
   assertFileContains(path.join(targetProjectDir, 'GEMINI.md'), 'Coordinated Workspace Instructions');
   assertFileContains(path.join(targetProjectDir, 'GEMINI.md'), 'Temporal Flow Validator');
 
+  // Assert SFE workspace rules scaffolding (Standard coding blueprint)
+  assertExists(path.join(targetProjectDir, '.agents/rules/sfe_code_boundary.md'));
+  assertFileContains(path.join(targetProjectDir, '.agents/rules/sfe_code_boundary.md'), 'activation: glob');
+
 
   // A. Product Manager Skill (web-pm, Node.js runtime)
   const pmDir = path.join(targetProjectDir, 'skillsets/web-pm');
@@ -328,6 +332,10 @@ async function run() {
   // Assert SFE active runtime enforcement files in compact target
   assertExists(path.join(compactTargetDir, 'GEMINI.md'));
   assertExists(path.join(compactTargetDir, 'tool_scripts/verify_sfe_flow.js'));
+  
+  // Assert SFE workspace rules scaffolding (Compact non-coding blueprint)
+  assertExists(path.join(compactTargetDir, '.agents/rules/sfe_coordination.md'));
+  assertFileContains(path.join(compactTargetDir, '.agents/rules/sfe_coordination.md'), 'activation: always-on');
   
   const agentMdPath = path.join(compactTargetDir, 'agents/python-expert_agent/AGENT.md');
   assertExists(agentMdPath);

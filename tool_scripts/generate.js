@@ -1464,6 +1464,32 @@ If Automated Verification fails:
     }
   }
 
+  // Write active workspace-specific rules in .agents/rules/
+  const targetRulesDir = path.join(targetDir, '.agents/rules');
+  ensureDirectory(targetRulesDir);
+
+  const isCoding = blueprint.skills.some(s => s.language && s.language !== 'default');
+
+  if (isCoding) {
+    const codeBoundaryPath = path.join(targetRulesDir, 'sfe_code_boundary.md');
+    const codeBoundaryTmpl = path.join(TEMPLATE_DIR, 'sfe_code_boundary_template.md');
+    if (fs.existsSync(codeBoundaryTmpl)) {
+      if (!fs.existsSync(codeBoundaryPath) || force) {
+        fs.copyFileSync(codeBoundaryTmpl, codeBoundaryPath);
+        console.log(`✓ Scaffolded glob-activated rules [${codeBoundaryPath}]`);
+      }
+    }
+  } else {
+    const coordPath = path.join(targetRulesDir, 'sfe_coordination.md');
+    const coordTmpl = path.join(TEMPLATE_DIR, 'sfe_coordination_template.md');
+    if (fs.existsSync(coordTmpl)) {
+      if (!fs.existsSync(coordPath) || force) {
+        fs.copyFileSync(coordTmpl, coordPath);
+        console.log(`✓ Scaffolded always-on rules [${coordPath}]`);
+      }
+    }
+  }
+
   // Write SFE Temporal Flow Validator script
   const targetToolScriptsDir = path.join(targetDir, 'tool_scripts');
   ensureDirectory(targetToolScriptsDir);
