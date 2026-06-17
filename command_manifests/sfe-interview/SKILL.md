@@ -22,6 +22,12 @@ requirements:
   - You operate inside a workspace utilizing the Senfide Engine.
   - Target system paths: scratch/blueprint.json.
   - Always consult lessons_index.md and playbook.md before execution to bypass regression.
+  - Mandated schema structure for scratch/blueprint.json:
+    projectName: string (Mandatory)
+    skills: Array of objects (Mandatory, non-empty)
+      Each skill object: { name: string, archetype: "pm"|"architect"|"developer"|"devops"|"qa"|"auditor", description: string, language?: string, triggers?: string[] }
+    agents?: Array of objects
+      Each agent object: { name: string, role: string, description: string, allowedSkills: string[], toolGroups: ("read_file"|"write_file"|"command"|"web")[] }
   </context>
 
   <task_definition>
@@ -70,6 +76,8 @@ requirements:
   - Ensure all scaffolded skills register globally in the index.
   - Always run verification tests in sandbox boundaries.
   - **Strict Grouping Firewall:** Block synthesis of redundant 1-to-1 agents if capabilities can be logically consolidated into a single multi-skill profile under the grouping rules.
+  - **Web Search Guardrail:** Do not perform web searches for internal framework terms (such as 'Senfide Engine', 'sfe blueprint'). The local codebase is the sole source of truth.
+  - **Banned Probing Rule:** Do not perform iterative trial-and-error shell execution of the CLI using temporary files to check blueprint schema limits. You must compose the final configuration in-memory, write it to `scratch/blueprint.json` in a single operation, and invoke `sfe --blueprint` exactly once.
   </scope_constraints>
 </instructions>
 

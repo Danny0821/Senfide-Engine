@@ -1200,13 +1200,12 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 
   const blueprint = validateBlueprint(rawBlueprint);
   
-  // Intelligent Path Resolution: Prevent redundant nesting (e.g. CWD/test-app/test-app)
+  // Intelligent Path Resolution: Scaffolds directly in current working directory (cwd)
+  // by default for relative projectNames to ensure active workspace rules are active immediately.
   const cwd = process.cwd();
-  let targetDir = path.resolve(blueprint.projectName);
-  if (!path.isAbsolute(blueprint.projectName)) {
-    if (path.basename(cwd).toLowerCase() === blueprint.projectName.toLowerCase()) {
-      targetDir = cwd;
-    }
+  let targetDir = cwd;
+  if (path.isAbsolute(blueprint.projectName)) {
+    targetDir = blueprint.projectName;
   }
 
   // Compile whitelisted agent list first
