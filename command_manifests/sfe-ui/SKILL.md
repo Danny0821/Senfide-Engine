@@ -1,11 +1,10 @@
 ---
 name: "sfe-ui"
 description: "Consult the UI/UX Advisor to discuss premium layouts, CSS styles, and design ideas."
-version: "0.1.0"
-triggers:
-  - "/sfe-ui"
-requirements:
-  - "node"
+compatibility: "Requires node"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-ui"
 ---
 
 # SKILL.md — sfe-ui

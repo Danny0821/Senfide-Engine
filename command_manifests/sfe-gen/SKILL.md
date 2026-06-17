@@ -1,11 +1,10 @@
 ---
 name: "sfe-gen"
 description: "Generate sandboxed skills, agent profiles, hooks, or multi-agent systems directly from natural language ideas."
-version: "0.1.0"
-triggers:
-  - "/sfe-gen"
-requirements:
-  - "node: >=18"
+compatibility: "Requires node: >=18"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-gen"
 ---
 
 # /sfe-gen — Senfide Engine Scaffolder Command

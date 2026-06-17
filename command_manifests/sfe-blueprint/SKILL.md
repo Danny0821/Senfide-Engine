@@ -1,11 +1,10 @@
 ---
 name: "sfe-blueprint"
 description: "Interactive architect that maps database schemas and tech boundaries to design and compile a compact multi-agent blueprint JSON."
-version: "0.1.0"
-triggers:
-  - "/sfe-blueprint"
-requirements:
-  - "node: >=18"
+compatibility: "Requires node: >=18"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-blueprint"
 ---
 
 # SKILL.md — Senfide Blueprint Scaffolder Playbook

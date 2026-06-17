@@ -1,11 +1,10 @@
 ---
 name: "{{NAME}}"
 description: "{{DESCRIPTION}}"
-version: "0.1.0"
-triggers:
-  {{TRIGGERS_LIST}}
-requirements:
-  {{REQUIREMENTS_LIST}}
+compatibility: "Requires {{COMPATIBILITY}}"
+metadata:
+  version: "0.1.0"
+  triggers: "{{TRIGGER}}"
 ---
 
 # SKILL.md — {{NAME}}

@@ -330,7 +330,7 @@ function runSandboxVerification() {
     }
 
     // Assert Architect Telemetry Zero-Slop
-    const archPlaybook = fs.readFileSync(path.join(architectSkillDir, 'playbook.md'), 'utf8');
+    const archPlaybook = fs.readFileSync(path.join(architectSkillDir, 'references/playbook.md'), 'utf8');
     if (!archPlaybook.includes('[SCHEMA_01]') || !archPlaybook.includes('Foreign Key constraints')) {
       throw new Error("Architect playbook is missing database schema design telemetry!");
     }
@@ -355,7 +355,7 @@ function runSandboxVerification() {
     }
 
     // Assert Developer JS Telemetry
-    const devPlaybook = fs.readFileSync(path.join(developerSkillDir, 'playbook.md'), 'utf8');
+    const devPlaybook = fs.readFileSync(path.join(developerSkillDir, 'references/playbook.md'), 'utf8');
     if (!devPlaybook.includes('[CLI_INPUT_01]') || !devPlaybook.includes('process.env')) {
       throw new Error("Developer JS playbook is missing Node.js environment telemetry!");
     }
@@ -365,7 +365,7 @@ function runSandboxVerification() {
     console.log("  ✓ Developer JS skill structurally validated (TDD-Based, JS Telemetry, correct DMCP).");
 
     // 3. Assert python-audit-api (Developer Python) contains correct pure Python telemetry (Zero-Slop regression fix)
-    const pyPlaybook = fs.readFileSync(path.join(pythonSkillDir, 'playbook.md'), 'utf8');
+    const pyPlaybook = fs.readFileSync(path.join(pythonSkillDir, 'references/playbook.md'), 'utf8');
     if (!pyPlaybook.includes('[TEST_RUNNER_01]') || !pyPlaybook.includes('pytest') || !pyPlaybook.includes('pathlib')) {
       throw new Error("Developer Python playbook is missing pytest/pathlib telemetry!");
     }
@@ -375,7 +375,7 @@ function runSandboxVerification() {
     console.log("  ✓ Developer Python skill structurally validated (TDD-Based, Python Telemetry, zero JS-slop).");
 
     // 4. Assert future/unsupported language fallback resolves cleanly to default agnostic telemetry
-    const cppPlaybook = fs.readFileSync(path.join(cppSkillDir, 'playbook.md'), 'utf8');
+    const cppPlaybook = fs.readFileSync(path.join(cppSkillDir, 'references/playbook.md'), 'utf8');
     if (!cppPlaybook.includes('[OS_PATH_01]') || !cppPlaybook.includes('[ENV_SECRET_01]')) {
       throw new Error("Fallback cascade failed: C++ skill did not generate default agnostic telemetry!");
     }
@@ -385,7 +385,7 @@ function runSandboxVerification() {
     console.log("  ✓ Safe Cascade Fallback validated (developer:cpp fell back cleanly to default agnostic telemetry).");
 
     // 5. Assert devops-deploy-pipeline (DevOps Archetype) contains correct DevOps telemetry
-    const devopsPlaybook = fs.readFileSync(path.join(devopsSkillDir, 'playbook.md'), 'utf8');
+    const devopsPlaybook = fs.readFileSync(path.join(devopsSkillDir, 'references/playbook.md'), 'utf8');
     if (!devopsPlaybook.includes('[DOCKER_MOUNT_01]') || !devopsPlaybook.includes('Windows volume mount')) {
       throw new Error("DevOps playbook is missing volume mount telemetry!");
     }
@@ -395,7 +395,7 @@ function runSandboxVerification() {
     console.log("  ✓ DevOps skill structurally validated (Zero-Slop, Pure DevOps Telemetry).");
 
     // 6. Assert qa-integration-suite (QA Archetype) contains correct QA telemetry
-    const qaPlaybook = fs.readFileSync(path.join(qaSkillDir, 'playbook.md'), 'utf8');
+    const qaPlaybook = fs.readFileSync(path.join(qaSkillDir, 'references/playbook.md'), 'utf8');
     if (!qaPlaybook.includes('[TEST_TIMEOUT_01]') || !qaPlaybook.includes('waitForSelector')) {
       throw new Error("QA playbook is missing test timeout telemetry!");
     }
@@ -405,7 +405,7 @@ function runSandboxVerification() {
     console.log("  ✓ QA skill structurally validated (Zero-Slop, Pure QA Telemetry).");
 
     // 7. Assert secret-leak-detector (Auditor Archetype) contains correct Auditor telemetry
-    const auditorPlaybook = fs.readFileSync(path.join(auditorSkillDir, 'playbook.md'), 'utf8');
+    const auditorPlaybook = fs.readFileSync(path.join(auditorSkillDir, 'references/playbook.md'), 'utf8');
     if (!auditorPlaybook.includes('[SCANNER_RULE_01]') || !auditorPlaybook.includes('Semgrep false positive')) {
       throw new Error("Auditor playbook is missing scanner rule telemetry!");
     }
@@ -415,7 +415,7 @@ function runSandboxVerification() {
     console.log("  ✓ Security Auditor skill structurally validated (Zero-Slop, Pure Auditor Telemetry).");
 
     // 8. Assert scrum-board-tracker (PM Archetype) contains correct PM telemetry
-    const pmPlaybook = fs.readFileSync(path.join(pmSkillDir, 'playbook.md'), 'utf8');
+    const pmPlaybook = fs.readFileSync(path.join(pmSkillDir, 'references/playbook.md'), 'utf8');
     if (!pmPlaybook.includes('[BACKLOG_01]') || !pmPlaybook.includes('prioritization tag duplication')) {
       throw new Error("PM playbook is missing backlog prioritization telemetry!");
     }

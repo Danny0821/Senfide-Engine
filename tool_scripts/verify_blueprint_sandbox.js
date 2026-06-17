@@ -171,7 +171,7 @@ async function run() {
   assertFileContains(path.join(pmDir, 'SKILL.md'), 'ROM Protocol');
   assertFileContains(path.join(pmDir, 'SKILL.md'), 'Human-Anchor Memory Guard');
   assertExists(path.join(pmDir, 'lessons_index.md'));
-  assertExists(path.join(pmDir, 'playbook.md'));
+  assertExists(path.join(pmDir, 'references/playbook.md'));
   assertExists(path.join(pmDir, 'scripts/security_check.js'));
   assertExists(path.join(pmDir, '.github/workflows/security_scan.yml'));
 
@@ -180,7 +180,7 @@ async function run() {
   console.log("  Asserting Architect Skill folder...");
   assertExists(path.join(dbDir, 'SKILL.md'));
   assertExists(path.join(dbDir, 'lessons_index.md'));
-  assertExists(path.join(dbDir, 'playbook.md'));
+  assertExists(path.join(dbDir, 'references/playbook.md'));
   assertNotExists(path.join(dbDir, 'scripts/security_check.js')); // Architect has no verifiers by default
   assertExists(path.join(dbDir, '.github/workflows/security_scan.yml'));
 
@@ -191,7 +191,7 @@ async function run() {
   assertFileContains(path.join(scanDir, 'SKILL.md'), 'AST Security Firewalls');
   assertFileContains(path.join(scanDir, 'SKILL.md'), 'AST Dependency Fallbacks');
   assertExists(path.join(scanDir, 'lessons_index.md'));
-  assertExists(path.join(scanDir, 'playbook.md'));
+  assertExists(path.join(scanDir, 'references/playbook.md'));
   assertExists(path.join(scanDir, 'scripts/security_check.py'));
   assertExists(path.join(scanDir, 'gitleaks.toml')); // Exclusions scaffolded!
   assertExists(path.join(scanDir, 'trivy.yaml'));     // Exclusions scaffolded!

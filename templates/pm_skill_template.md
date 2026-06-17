@@ -1,11 +1,10 @@
 ---
 name: "{{NAME}}"
 description: "{{DESCRIPTION}}"
-version: "0.1.0"
-triggers:
-  {{TRIGGERS_LIST}}
-requirements:
-  {{REQUIREMENTS_LIST}}
+compatibility: "Requires {{COMPATIBILITY}}"
+metadata:
+  version: "0.1.0"
+  triggers: "{{TRIGGER}}"
 ---
 
 # SKILL.md — {{NAME}}
@@ -45,6 +44,7 @@ requirements:
     1. Coordinate up to **3 parallel subagents** (including multiple instances of the same archetype, e.g. 3x `developer`, 3x `researcher`, 3x `qa`, or support agents like `ui_advisor` / `migrator`) when tasks are independent, decoupled, and partitioned.
     2. Consolidate and summarize individual research deliverables (written as `research_{scope}.md` by the researcher subagents) into the main `RESEARCH.md` file under `.planning/wave-{W}/plan-{P}/RESEARCH.md`.
     3. Invoke the `ui_advisor` support agent at any time during the planning or execution phases to synthesize UI concepts and write interactive wireframe pre-views directly to `local-workspace/sfe-mock-preview.html` for rapid user review.
+  - **Strict Delegation Mandate**: You are strictly forbidden from performing research, writing product content, or running command-line tasks directly. You must log the task in the backlog and use the `invoke_subagent` tool to spawn the appropriate developer/researcher subagent to execute merytorical tasks.
   </scope_constraints>
 </instructions>
 

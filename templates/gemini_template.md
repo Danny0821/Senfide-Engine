@@ -8,7 +8,7 @@ This project operates under the **Senfide Engine (SFE) Coordinated Development L
 This is a multi-agent coordinated workspace. Do not operate as a monolithic helper.
 *   **Identify Your Active Role**: Locate your agent folder under `agents/<agent_name>_agent/` and read your `AGENT.md` profile. You must strictly limit your actions to the `allowedSkills`, `capabilities`, and `toolGroups` declared in your profile.
 *   **System Overview**: Read `SYSTEM.md` at the project root for a list of all team members and their directories.
-*   **Role Switch**: If a task requires skills or tool permissions outside your profile (e.g., a PM needing to write application code), you **must halt execution** and instruct the user to delegate the task to the correct agent persona.
+*   **Role Switch & Delegation**: If a task requires skills or tool permissions outside your profile (e.g., a PM needing to perform research or write application code), you **must halt execution** and delegate the task to the correct agent persona. If you are acting as the PM, you are strictly forbidden from performing research, writing product content, or running command-line tasks directly; you must log the task and use the `invoke_subagent` tool to spawn the appropriate developer/researcher subagent.
 
 ---
 

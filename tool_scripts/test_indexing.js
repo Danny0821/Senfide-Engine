@@ -134,7 +134,9 @@ function runTests() {
 
     // 6. Frontmatter parsing
     console.log("\n🧪 Test 6: Frontmatter parsing...");
-    const sampleSkillMd = `---
+    
+    // 6a. Legacy Frontmatter
+    const legacySkillMd = `---
 name: "git-branch-naming-validator"
 description: "Verify local Git branch names"
 version: "0.1.0"
@@ -147,18 +149,39 @@ requirements:
 ---
 # Main Content here
 `;
-    const parsed = parseFrontmatter(sampleSkillMd);
-    assert(parsed !== null, "Parsing frontmatter failed.");
-    assert(parsed.name === 'git-branch-naming-validator', "Frontmatter name mismatch.");
-    assert(parsed.version === '0.1.0', "Frontmatter version mismatch.");
-    assert(Array.isArray(parsed.triggers), "Triggers frontmatter must be parsed as array.");
-    assert(parsed.triggers.length === 2, `Triggers size mismatch: ${parsed.triggers.length}`);
-    assert(parsed.triggers[1] === '/validate-branch', "Triggers index mismatch.");
-    assert(Array.isArray(parsed.requirements), "Requirements must be parsed as an array.");
-    assert(parsed.requirements.length === 2, "Requirements size mismatch.");
-    assert(parsed.requirements[0] === 'node: >=18', "Requirement[0] mismatch.");
-    assert(parsed.requirements[1] === 'python: >=3.10', "Requirement[1] mismatch.");
-    console.log("  ✓ Yaml frontmatter parsed seamlessly without dependencies.");
+    const parsedLegacy = parseFrontmatter(legacySkillMd);
+    assert(parsedLegacy !== null, "Parsing legacy frontmatter failed.");
+    assert(parsedLegacy.name === 'git-branch-naming-validator', "Legacy name mismatch.");
+    assert(parsedLegacy.version === '0.1.0', "Legacy version mismatch.");
+    assert(Array.isArray(parsedLegacy.triggers), "Legacy triggers must be array.");
+    assert(parsedLegacy.triggers.length === 2, "Legacy triggers size mismatch.");
+    assert(Array.isArray(parsedLegacy.requirements), "Legacy requirements must be array.");
+    assert(parsedLegacy.requirements.length === 2, "Legacy requirements size mismatch.");
+
+    // 6b. Standard-compliant Nested Frontmatter
+    const standardSkillMd = `---
+name: "git-branch-naming-validator"
+description: "Verify local Git branch names"
+compatibility: "Requires node: >=18, python: >=3.10"
+metadata:
+  version: "0.1.0"
+  triggers: "/validate-branch"
+---
+# Main Content here
+`;
+    const parsedStandard = parseFrontmatter(standardSkillMd);
+    assert(parsedStandard !== null, "Parsing standard frontmatter failed.");
+    assert(parsedStandard.name === 'git-branch-naming-validator', "Standard name mismatch.");
+    assert(parsedStandard.version === '0.1.0', "Standard version mismatch.");
+    assert(Array.isArray(parsedStandard.triggers), "Standard triggers must be normalized to array.");
+    assert(parsedStandard.triggers.length === 1, "Standard triggers size mismatch.");
+    assert(parsedStandard.triggers[0] === '/validate-branch', "Standard trigger mismatch.");
+    assert(Array.isArray(parsedStandard.requirements), "Standard compatibility must be normalized to requirements array.");
+    assert(parsedStandard.requirements.length === 2, "Standard requirements size mismatch.");
+    assert(parsedStandard.requirements[0] === 'node: >=18', "Requirement[0] mismatch.");
+    assert(parsedStandard.requirements[1] === 'python: >=3.10', "Requirement[1] mismatch.");
+
+    console.log("  ✓ Yaml frontmatter parsed and normalized seamlessly for both legacy and standard formats.");
 
     // 7. Directory Crawling Workspace Discovery
     console.log("\n🧪 Test 7: Directory scanning...");
@@ -166,7 +189,7 @@ requirements:
     const crawlerWorkspace = path.join(TEST_DIR, 'crawler-workspace');
     const childSkillDir = path.join(crawlerWorkspace, 'my-discovered-skill');
     fs.mkdirSync(childSkillDir, { recursive: true });
-    fs.writeFileSync(path.join(childSkillDir, 'SKILL.md'), sampleSkillMd, 'utf8');
+    fs.writeFileSync(path.join(childSkillDir, 'SKILL.md'), standardSkillMd, 'utf8');
 
     // Trigger crawl
     const discovered = scanWorkspace(crawlerWorkspace);

@@ -48,7 +48,7 @@ function runSimulation() {
     console.log("\n🧪 Running sandbox output assertions...");
     assertExists(path.join(SANDBOX_DIR, 'SKILL.md'));
     assertExists(path.join(SANDBOX_DIR, 'lessons_index.md'));
-    assertExists(path.join(SANDBOX_DIR, 'playbook.md'));
+    assertExists(path.join(SANDBOX_DIR, 'references/playbook.md'));
     assertExists(path.join(SANDBOX_DIR, 'evals/evals.json'));
     assertExists(path.join(SANDBOX_DIR, 'references'));
     assertExists(path.join(SANDBOX_DIR, 'scripts/security_check.js'));

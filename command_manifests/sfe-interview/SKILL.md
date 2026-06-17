@@ -1,11 +1,10 @@
 ---
 name: "sfe-interview"
 description: "Interactive onboarding assistant that conducts a step-by-step interview to discover project goals and scope requirements."
-version: "0.1.0"
-triggers:
-  - "/sfe-interview"
-requirements:
-  - "node: >=18"
+compatibility: "Requires node: >=18"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-interview"
 ---
 
 # SKILL.md — Senfide Agentic Interviewer Playbook

@@ -65,7 +65,7 @@ async function runTests() {
     // Assert system files
     assertExists(path.join(systemDir, 'SYSTEM.md'));
     assertExists(path.join(systemDir, 'lessons_index.md'));
-    assertExists(path.join(systemDir, 'playbook.md'));
+    assertExists(path.join(systemDir, 'references/playbook.md'));
     
     // Assert base structure files
     assertExists(path.join(systemDir, '.sfe-version'));
@@ -85,7 +85,7 @@ async function runTests() {
     assertFileContains(path.join(systemDir, 'skillsets/python-audit/SKILL.md'), 'AST Security Firewalls');
     assertFileContains(path.join(systemDir, 'skillsets/python-audit/SKILL.md'), 'AST Dependency Fallbacks');
     assertExists(path.join(systemDir, 'skillsets/python-audit/lessons_index.md'));
-    assertExists(path.join(systemDir, 'skillsets/python-audit/playbook.md'));
+    assertExists(path.join(systemDir, 'skillsets/python-audit/references/playbook.md'));
     assertExists(path.join(systemDir, 'skillsets/python-audit/scripts/security_check.py'));
     assertExists(path.join(systemDir, 'skillsets/python-audit/evals/evals.json'));
     assertExists(path.join(systemDir, 'skillsets/python-audit/references'));
@@ -93,7 +93,7 @@ async function runTests() {
     assertExists(path.join(systemDir, 'skillsets/python-fixer/SKILL.md'));
     assertFileContains(path.join(systemDir, 'skillsets/python-fixer/SKILL.md'), 'Two-Stage Type-Gating & TDD Loop');
     assertExists(path.join(systemDir, 'skillsets/python-fixer/lessons_index.md'));
-    assertExists(path.join(systemDir, 'skillsets/python-fixer/playbook.md'));
+    assertExists(path.join(systemDir, 'skillsets/python-fixer/references/playbook.md'));
     assertExists(path.join(systemDir, 'skillsets/python-fixer/evals/evals.json'));
     assertExists(path.join(systemDir, 'skillsets/python-fixer/references'));
 

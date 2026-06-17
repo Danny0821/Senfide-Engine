@@ -22,7 +22,9 @@ import path from 'path';
  */
 export function verifyDirectory(skillDir) {
   const indexFile = path.join(skillDir, 'lessons_index.md');
-  const playbookFile = path.join(skillDir, 'playbook.md');
+  const legacyPlaybookFile = path.join(skillDir, 'playbook.md');
+  const standardPlaybookFile = path.join(skillDir, 'references', 'playbook.md');
+  const playbookFile = fs.existsSync(standardPlaybookFile) ? standardPlaybookFile : legacyPlaybookFile;
 
   const report = {
     valid: true,
@@ -78,8 +80,8 @@ export function verifyDirectory(skillDir) {
     referencedTags.add(tag);
     report.indexedCount++;
 
-    // Check for Ref coordinate pointer: Ref: playbook.md#L[start]-L[end]
-    const refMatch = line.match(/Ref:\s+playbook\.md#L(\d+)(?:-L(\d+))?/i);
+    // Check for Ref coordinate pointer: Ref: playbook.md#L[start]-L[end] (or references/playbook.md#L[start])
+    const refMatch = line.match(/Ref:\s+(?:references\/)?playbook\.md#L(\d+)(?:-L(\d+))?/i);
 
     if (!refMatch) {
       // It's a token-optimized one-liner lesson!
@@ -143,6 +145,7 @@ export function scanAndVerify(searchPath) {
     const report = verifyDirectory(dir);
     if (report) {
       reports.push(report);
+      return; // Skip traversing deeper into this skill's folder
     }
 
     let files;

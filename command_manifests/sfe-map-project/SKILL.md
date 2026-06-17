@@ -1,11 +1,10 @@
 ---
 name: "sfe-map-project"
 description: "Scan the target directory recursively to auto-detect codebase stack and suggest optimized SFE blueprint."
-version: "0.1.0"
-triggers:
-  - "/sfe-map-project"
-requirements:
-  - "node"
+compatibility: "Requires node"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-map-project"
 ---
 
 # SKILL.md — sfe-map-project

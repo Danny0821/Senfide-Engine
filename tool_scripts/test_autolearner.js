@@ -30,7 +30,7 @@ const TEMPLATES_DIR = path.resolve(__dirname, '../templates');
 function recordNewLesson(workspace, lesson) {
   const { tag, title, issue, cause, fix, code } = lesson;
   const indexPath = path.join(workspace, 'lessons_index.md');
-  const playbookPath = path.join(workspace, 'playbook.md');
+  const playbookPath = path.join(workspace, 'references/playbook.md');
 
   if (!fs.existsSync(indexPath) || !fs.existsSync(playbookPath)) {
     throw new Error("Autolearner files not scaffolded in target workspace.");
@@ -61,7 +61,7 @@ ${code}
   console.log(`  🟢 Appended detailed post-mortem to playbook.md (Lines L${startLine}-L${endLine})`);
 
   // 4. Draft and append the coordinate bullet to lessons_index.md
-  const indexBullet = `- \`[${tag}]\` ${title}. Ref: playbook.md#L${startLine}-L${endLine}\n`;
+  const indexBullet = `- \`[${tag}]\` ${title}. Ref: references/playbook.md#L${startLine}-L${endLine}\n`;
   fs.appendFileSync(indexPath, indexBullet, 'utf-8');
   console.log(`  🟢 Appended coordinate bullet to lessons_index.md: ${indexBullet.trim()}`);
 }
@@ -97,7 +97,10 @@ function setupTestWorkspace() {
   }
 
   fs.writeFileSync(path.join(TEST_WORKSPACE, 'lessons_index.md'), hydratedIndex, 'utf-8');
-  fs.writeFileSync(path.join(TEST_WORKSPACE, 'playbook.md'), hydratedPlaybook, 'utf-8');
+  if (!fs.existsSync(path.join(TEST_WORKSPACE, 'references'))) {
+    fs.mkdirSync(path.join(TEST_WORKSPACE, 'references'), { recursive: true });
+  }
+  fs.writeFileSync(path.join(TEST_WORKSPACE, 'references/playbook.md'), hydratedPlaybook, 'utf-8');
   console.log("🧹 Initialized mock Autolearner workspace with clean templates.");
 }
 
@@ -106,7 +109,7 @@ function setupTestWorkspace() {
  */
 function verifyAutolearnerIntegrity(tag) {
   const indexPath = path.join(TEST_WORKSPACE, 'lessons_index.md');
-  const playbookPath = path.join(TEST_WORKSPACE, 'playbook.md');
+  const playbookPath = path.join(TEST_WORKSPACE, 'references/playbook.md');
 
   const indexContent = fs.readFileSync(indexPath, 'utf-8');
   const playbookContent = fs.readFileSync(playbookPath, 'utf-8');
@@ -118,7 +121,7 @@ function verifyAutolearnerIntegrity(tag) {
   }
 
   // 2. Parse out the line coordinate from the lessons_index.md for this tag
-  const regex = new RegExp(`- \\\`\\[${tag}\\]\\\` .*\\. Ref: playbook\\.md#L(\\d+)-L(\\d+)`);
+  const regex = new RegExp(`- \\\`\\[${tag}\\]\\\` .*\\. Ref: (?:references/)?playbook\\.md#L(\\d+)-L(\\d+)`);
   const match = indexContent.match(regex);
   if (!match) {
     throw new Error(`Integrity Check Failed: Coordinate link format invalid for tag [${tag}]`);

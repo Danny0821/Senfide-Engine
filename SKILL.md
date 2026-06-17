@@ -1,11 +1,10 @@
 ---
 name: "senfide-engine"
 description: "Scaffold security-first, Caveman-styled skills, hooks, agents, or multi-agent systems for the Senfide Engine."
-version: "0.1.0"
-triggers:
-  - "/sfe-gen"
-requirements:
-  - "node: >=18"
+compatibility: "Requires node: >=18"
+metadata:
+  version: "0.1.0"
+  triggers: "/sfe-gen"
 ---
 
 # SKILL.md — Senfide Engine (Caveman Style)

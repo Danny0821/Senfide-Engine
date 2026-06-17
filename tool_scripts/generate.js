@@ -280,8 +280,9 @@ export function scaffoldAutolearner(targetDir, componentName, archetype = 'defau
       hydrateTemplate(indexTmpl, replacements),
       'utf-8'
     );
+    ensureDirectory(path.join(targetDir, 'references'));
     fs.writeFileSync(
-      path.join(targetDir, 'playbook.md'),
+      path.join(targetDir, 'references', 'playbook.md'),
       hydrateTemplate(playbookTmpl, replacements),
       'utf-8'
     );
@@ -361,7 +362,7 @@ export const ARCHETYPE_PROFILES = {
       "Confirm ROADMAP.md is successfully committed in repository root.",
       "Confirm PM classifies incoming requests and dispatches structured tasks inside BACKLOG.md."
     ],
-    coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a Product Manager (PM). If the workspace is empty, you have priority. Execute immediately to output the roadmap, unblocking design and engineering phases.",
+    coordinationRules: "- **Lifecycle Coordination (DMCP)**:\n    1. **Orchestrated Mode**: If a parent coordinator is active, follow specific scheduling directives.\n    2. **Choreographed Fallback**: You are a Product Manager (PM). If the workspace is empty, you have priority. Execute immediately to output the roadmap, unblocking design and engineering phases.\n    3. **Strict Delegation**: You are strictly forbidden from performing research, writing product content, or running command-line tasks directly. You must log the task in the backlog and use the `invoke_subagent` tool to spawn the appropriate developer/researcher subagent.",
     scriptLanguage: 'js'
   },
   architect: {
@@ -581,6 +582,10 @@ export function scaffoldSkill(options) {
   // Resolve Script Language
   const targetScriptLang = scriptLanguage || profile.scriptLanguage || 'js';
 
+  // Compute standard-compliant compatibility and trigger mappings
+  const compatibilityVal = requirementLines.map(r => r.replace(/^['"]|['"]$/g, '')).join(', ');
+  const triggerVal = triggerLines[0] ? triggerLines[0].replace(/^['"]|['"]$/g, '') : '';
+
   // Hydrate template variables (DMCP & Dynamic tag hydration)
   const hydrated = hydrateTemplate(template, {
     NAME: name,
@@ -588,6 +593,8 @@ export function scaffoldSkill(options) {
     TAGS: tags.split(',').map(t => t.trim()).filter(Boolean).join(', '),
     TRIGGERS_LIST: triggersListStr,
     REQUIREMENTS_LIST: requirementsListStr,
+    COMPATIBILITY: compatibilityVal,
+    TRIGGER: triggerVal,
     PLAYBOOK_STEPS: playbookStepsStr,
     REVIEW_CHECKS: reviewChecksStr,
     COORDINATION_RULES: profile.coordinationRules
@@ -819,7 +826,7 @@ jobs:
   }
 
   // Generate high-density telegraphic log
-  const filesList = ['SKILL.md', 'lessons_index.md', 'playbook.md'];
+  const filesList = ['SKILL.md', 'lessons_index.md', 'references/playbook.md'];
   if (targetScriptLang === 'py' || targetScriptLang === 'js') {
     filesList.push(`scripts/security_check.${targetScriptLang}`);
   }
@@ -1299,7 +1306,8 @@ export async function scaffoldFromBlueprint(blueprintPath, force = false) {
 
   // Write central coordinated playbook files for the team
   const roadmapPath = path.join(targetDir, 'lessons_index.md');
-  const playbookPath = path.join(targetDir, 'playbook.md');
+  ensureDirectory(path.join(targetDir, 'references'));
+  const playbookPath = path.join(targetDir, 'references', 'playbook.md');
 
   const roadmapContent = `# Coordinated Team Issue Index
 

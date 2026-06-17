@@ -58,6 +58,22 @@ function parseFrontmatter(content) {
     }
   });
 
+  // Normalize compatibility to requirements array
+  if (result.compatibility && (!result.requirements || result.requirements.length === 0)) {
+    const clean = result.compatibility.replace(/^Requires\s+/i, '');
+    result.requirements = clean.split(',').map(r => r.trim()).filter(Boolean);
+  }
+
+  // Normalize triggers to array if parsed as a string
+  if (typeof result.triggers === 'string') {
+    result.triggers = [result.triggers];
+  }
+
+  // Ensure version is always a string
+  if (!result.version) {
+    result.version = '0.1.0';
+  }
+
   return result;
 }
 
@@ -112,7 +128,9 @@ function runManifestTests() {
       console.log(`  ✓ Trigger registered: ${frontmatter.triggers[0]}`);
 
       // 3. Verify playbook.md if present for purification and anti-bloviating
-      const playbookPath = path.join(dirPath, 'playbook.md');
+      const standardPlaybookPath = path.join(dirPath, 'references/playbook.md');
+      const legacyPlaybookPath = path.join(dirPath, 'playbook.md');
+      const playbookPath = fs.existsSync(standardPlaybookPath) ? standardPlaybookPath : legacyPlaybookPath;
       if (fs.existsSync(playbookPath)) {
         const playbookContent = fs.readFileSync(playbookPath, 'utf8');
 
