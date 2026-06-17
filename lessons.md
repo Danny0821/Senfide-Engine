@@ -35,6 +35,7 @@
 - PowerShell Native Stream Redirection: Native Go CLI helper commands writing usage or help logs to stderr by default will raise PowerShell native command errors unless output streams are merged using stderr redirection (`2>&1`).
 - Autolearner Telemetry Alignment Checkers: Integrates a cross-file synchronization checker (`verify_autolearner_integrity.js`) into the test harness to audit coordinate line mapping errors between `lessons_index.md` and `playbook.md`. Standardizes template coordinates to prevent code drift and allows coordinate-less one-liner index tags for token-efficient telemetry.
 - Global Onboarding Design Specialists: Adds a `/sfe-ui` global slash command to trigger conversational UI/UX brainstorming sessions. Integrates sfe-ui into global installation and teardown suites. Directs the PM to invoke the ui_advisor subagent at any time to generate rapid interface previews directly to `local-workspace/sfe-mock-preview.html`.
+- Project Mapping Directory Exclusions: Strictly exclude SFE-generated directories containing automation scripts and configuration files (`tool_scripts`, `agents`, `.agents`, `.planning`) from the codebase stack analyzer (`project_mapper.js`) to prevent false-positive coding stack classification (e.g., mapping prose/documentation workspaces as JavaScript).
 
 
 

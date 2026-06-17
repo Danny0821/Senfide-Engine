@@ -21,7 +21,7 @@ import path from 'path';
  */
 export function scanFiles(dirPath) {
   const fileList = [];
-  const skippedDirs = ['node_modules', '.git', 'output_test', 'dist', 'build', 'skillsets', 'output', 'coverage', '.gemini', 'tool_tests', 'scratch', 'local-workspace'];
+  const skippedDirs = ['node_modules', '.git', 'output_test', 'dist', 'build', 'skillsets', 'output', 'coverage', '.gemini', 'tool_tests', 'scratch', 'local-workspace', 'tool_scripts', '.agents', '.planning', 'agents'];
 
   function traverse(currentDir) {
     if (!fs.existsSync(currentDir)) return;

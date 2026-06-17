@@ -63,6 +63,8 @@ function setupMockWorkspaces() {
   const wsD = path.join(TEST_ROOT, 'prose-project');
   createMockFile(path.join(wsD, 'README.md'), '# Project readme');
   createMockFile(path.join(wsD, 'docs/outline.txt'), 'Editorial outline contents');
+  createMockFile(path.join(wsD, 'tool_scripts/verify_sfe_flow.js'), '// SFE workflow runner');
+  createMockFile(path.join(wsD, '.agents/pm/agent.json'), '{}');
 }
 
 function runMapperTests() {
