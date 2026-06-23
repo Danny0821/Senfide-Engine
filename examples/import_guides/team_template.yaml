@@ -1,0 +1,17 @@
+projectName: "[Unikalna nazwa projektu lub absolutna ścieżkę do katalogu docelowego]"
+coordinationRules: "[Opcjonalnie: Opis reguł koordynacji zespołu/bramki decyzyjne]"
+
+agents:
+  - name: "[Krótki identyfikator agenta, np. pm / developer / qa / auditor / devops]"
+    role: "[Pełna nazwa roli, np. Architekt Danych]"
+    description: "[Opis odpowiedzialności agenta]"
+    toolGroups:
+      # Dozwolone grupy narzędzi: "read_file", "write_file", "command", "web"
+      - "[Wybierz grupę narzędzi 1]"
+    skills:
+      - name: "[unikalna-nazwa-umiejetnosci]"
+        archetype: "[Archetyp bazowy SFE: pm / developer / architect / qa / auditor / devops]"
+        language: "[Opcjonalny język kodu dla skilla: js / py / default]"
+        description: "[Krótki opis skilla]"
+        tasks:
+          - "[Konkretne zadanie 1]"

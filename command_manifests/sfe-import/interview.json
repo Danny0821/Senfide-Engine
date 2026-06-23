@@ -1,0 +1,7 @@
+{
+  "name": "sfe-import",
+  "description": "Declarative importer that reads Markdown or YAML team specifications, validates them, and scaffolds a multi-agent team.",
+  "version": "0.1.0",
+  "triggers": ["/sfe-import"],
+  "skillPath": ".agent/skills/sfe-import"
+}

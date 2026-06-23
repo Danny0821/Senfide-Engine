@@ -21,6 +21,13 @@ const GLOBAL_SKILLS_DIRS = [
   path.resolve(os.homedir(), '.gemini/config/skills')
 ];
 
+const GLOBAL_TEMPLATES_DIRS = [
+  path.resolve(os.homedir(), '.gemini/templates'),
+  path.resolve(os.homedir(), '.gemini/antigravity/templates'),
+  path.resolve(os.homedir(), '.gemini/antigravity-cli/templates'),
+  path.resolve(os.homedir(), '.gemini/config/templates')
+];
+
 // Target global bin directory for Windows launchers
 const GLOBAL_BIN_DIR = path.resolve(os.homedir(), '.gemini/config/bin');
 
@@ -90,9 +97,29 @@ function uninstallGlobally() {
             fs.rmSync(mapDir, { recursive: true, force: true });
             console.log(`  ✓ Removed sfe-map-project from: ${dir}`);
           }
+
+          // Remove /sfe-import folder
+          const importDir = path.join(dir, 'sfe-import');
+          if (fs.existsSync(importDir)) {
+            fs.rmSync(importDir, { recursive: true, force: true });
+            console.log(`  ✓ Removed sfe-import from: ${dir}`);
+          }
         }
       } catch (dirErr) {
         console.warn(`  ⚠️ Warning: Could not clean folder ${dir}: ${dirErr.message}`);
+      }
+    });
+
+    // 1.2 Clean up global reference templates (import guides)
+    GLOBAL_TEMPLATES_DIRS.forEach(dir => {
+      try {
+        const targetGuidesPath = path.join(dir, 'import_guides');
+        if (fs.existsSync(targetGuidesPath)) {
+          fs.rmSync(targetGuidesPath, { recursive: true, force: true });
+          console.log(`  ✓ Removed reference templates from: ${dir}`);
+        }
+      } catch (dirErr) {
+        console.warn(`  ⚠️ Warning: Could not clean templates folder ${dir}: ${dirErr.message}`);
       }
     });
 

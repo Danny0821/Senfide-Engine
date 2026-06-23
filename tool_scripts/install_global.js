@@ -27,6 +27,13 @@ const GLOBAL_SKILLS_DIRS = [
   path.resolve(os.homedir(), '.gemini/config/skills')
 ];
 
+const GLOBAL_TEMPLATES_DIRS = [
+  path.resolve(os.homedir(), '.gemini/templates'),
+  path.resolve(os.homedir(), '.gemini/antigravity/templates'),
+  path.resolve(os.homedir(), '.gemini/antigravity-cli/templates'),
+  path.resolve(os.homedir(), '.gemini/config/templates')
+];
+
 // Target global bin directory for Windows launchers
 const GLOBAL_BIN_DIR = path.resolve(os.homedir(), '.gemini/config/bin');
 
@@ -36,6 +43,7 @@ const LOCAL_INTERVIEW_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-inte
 const LOCAL_BLUEPRINT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-blueprint');
 const LOCAL_UI_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-ui');
 const LOCAL_MAP_PROJECT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-map-project');
+const LOCAL_IMPORT_PATH = path.join(PACKAGE_ROOT, 'command_manifests/sfe-import');
 
 /**
  * Recursively copies a directory to a target destination in zero-dependency Node.js.
@@ -81,6 +89,9 @@ function installGlobally() {
     }
     if (!fs.existsSync(LOCAL_MAP_PROJECT_PATH)) {
       throw new Error(`Source sfe-map-project folder not found at ${LOCAL_MAP_PROJECT_PATH}.`);
+    }
+    if (!fs.existsSync(LOCAL_IMPORT_PATH)) {
+      throw new Error(`Source sfe-import folder not found at ${LOCAL_IMPORT_PATH}.`);
     }
 
     // 2. Synchronize to all potential native slash command folders (Quad-Path Sync)
@@ -146,11 +157,36 @@ function installGlobally() {
         }
         copyFolderRecursiveSync(LOCAL_MAP_PROJECT_PATH, targetMapProjectPath);
 
+        // Copy /sfe-import manifest folder
+        const targetImportPath = path.join(dir, 'sfe-import');
+        if (fs.existsSync(targetImportPath)) {
+          fs.rmSync(targetImportPath, { recursive: true, force: true });
+        }
+        copyFolderRecursiveSync(LOCAL_IMPORT_PATH, targetImportPath);
+
         console.log(`  🟢 Synced to: ${dir}`);
       } catch (dirErr) {
         console.warn(`  ⚠️ Could not write to directory ${dir}: ${dirErr.message}`);
       }
     });
+
+    // 2.2 Synchronize reference templates (import guides)
+    console.log("\n📁 Syncing reference templates to native global folders...");
+    const LOCAL_TEMPLATES_SRC = path.join(PACKAGE_ROOT, 'examples/import_guides');
+    if (fs.existsSync(LOCAL_TEMPLATES_SRC)) {
+      GLOBAL_TEMPLATES_DIRS.forEach(dir => {
+        try {
+          const targetGuidesPath = path.join(dir, 'import_guides');
+          if (fs.existsSync(targetGuidesPath)) {
+            fs.rmSync(targetGuidesPath, { recursive: true, force: true });
+          }
+          copyFolderRecursiveSync(LOCAL_TEMPLATES_SRC, targetGuidesPath);
+          console.log(`  🟢 Synced templates to: ${dir}`);
+        } catch (dirErr) {
+          console.warn(`  ⚠️ Could not write templates to directory ${dir}: ${dirErr.message}`);
+        }
+      });
+    }
 
     // 3. Compile and write local Windows launcher files
     if (process.platform === 'win32') {
@@ -214,7 +250,7 @@ exit $LASTEXITCODE`;
 
     console.log(`\n🟢 Success! System-wide registration complete.`);
     console.log("\n✨ The native slash commands are now active globally!");
-    console.log("👉 You can now type `/sfe-gen`, `/sfe-interview`, `/sfe-blueprint`, `/sfe-ui`, or `/sfe-map-project` inside your Windows agy client.");
+    console.log("👉 You can now type `/sfe-gen`, `/sfe-interview`, `/sfe-blueprint`, `/sfe-ui`, `/sfe-map-project`, or `/sfe-import` inside your Windows agy client.");
     console.log("=========================================================");
   } catch (err) {
     console.error(`\n🔴 Installation failed: ${err.message}`);
